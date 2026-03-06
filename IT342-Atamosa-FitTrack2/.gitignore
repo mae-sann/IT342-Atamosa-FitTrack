@@ -1,0 +1,34 @@
+# Markdown files
+*.md
+
+# Backend build artifacts
+backend/target/
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.vscode/
+backend/.idea/
+backend/*.iml
+backend/node_modules/
+
+# Frontend build artifacts
+web/node_modules/
+web/dist/
+web/.vite/
+web/.vscode/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+Thumbs.db
