@@ -1,0 +1,39 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+*.swp
+*.swo
+*~
+
+# Node/npm
+node_modules/
+package-lock.json
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+.env
+.env.local
+
+# Layout folder
+layout/

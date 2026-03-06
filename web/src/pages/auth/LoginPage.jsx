@@ -1,20 +1,15 @@
 // src/pages/auth/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Logo from '../../components/ui/Logo';
-import Button from '../../components/ui/Button';
-import { Input } from '../../components/ui/FormField';
 import { useAuth } from '../../context/AuthContext';
-import styles from './AuthPage.module.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [form, setForm]       = useState({ email: '', password: '' });
-  const [errors, setErrors]   = useState({});
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [showPass, setShowPass] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,8 +19,8 @@ export default function LoginPage() {
 
   const validate = () => {
     const e = {};
-    if (!form.email.trim())    e.email    = 'Email is required';
-    if (!form.password)        e.password = 'Password is required';
+    if (!form.email.trim()) e.email = 'Email is required';
+    if (!form.password) e.password = 'Password is required';
     return e;
   };
 
@@ -45,98 +40,200 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogle = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-  };
-
-  const EyeIcon = ({ visible }) => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ cursor:'pointer' }}>
-      {visible
-        ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/></>
-        : <><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></>
-      }
-    </svg>
-  );
-
   return (
-    <div className={styles.authWrap}>
-      <div className={styles.authBg} />
-      <div className={styles.authGridLines} />
-
-      <div className={styles.authCard}>
-        <div className={styles.authLogo}>
-          <Logo size="lg" />
+    <div style={{ 
+      fontFamily: "'Inter', sans-serif",
+      backgroundColor: '#050a15',
+      backgroundImage: `
+        linear-gradient(rgba(25, 34, 53, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(25, 34, 53, 0.3) 1px, transparent 1px)
+      `,
+      backgroundSize: '50px 50px',
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }}>
+      <div style={{
+        backgroundColor: '#0d1526',
+        border: '1px solid rgba(30, 41, 59, 0.8)',
+        boxShadow: '0 20px 60px -12px rgba(0, 0, 0, 0.8), 0 0 1px rgba(59, 130, 246, 0.1)',
+        width: '100%',
+        maxWidth: '460px',
+        borderRadius: '20px',
+        padding: '52px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div style={{
+          width: '56px',
+          height: '56px',
+          background: 'linear-gradient(135deg, #2b7fff 0%, #1d66e5 100%)',
+          borderRadius: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '32px',
+          boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
+        }}>
+          <span style={{ fontSize: '28px' }}>💪</span>
         </div>
 
-        <div className={styles.authHeader}>
-          <h1 className={styles.authTitle}>Welcome Back</h1>
-          <p className={styles.authSub}>Sign in to continue your fitness journey</p>
-        </div>
+        <h1 style={{ color: 'white', fontSize: '28px', fontWeight: '700', marginBottom: '8px', textAlign: 'center' }}>
+          Welcome Back
+        </h1>
+        
+        <p style={{ color: '#9ca3af', fontSize: '15px', marginBottom: '32px', textAlign: 'center', fontWeight: '500' }}>
+          Log in to continue your fitness journey
+        </p>
 
-        {/* Google */}
-        <button className={styles.googleBtn} onClick={handleGoogle} type="button">
-          <svg width="18" height="18" viewBox="0 0 48 48">
-            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
-            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
-            <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
-            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
-          </svg>
-          Continue with Google
-        </button>
+        {errors.api && (
+          <div style={{
+            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+            border: '1px solid rgba(220, 38, 38, 0.3)',
+            color: '#fca5a5',
+            padding: '14px 16px',
+            borderRadius: '12px',
+            marginBottom: '24px',
+            fontSize: '14px',
+            width: '100%',
+            display: 'flex',
+            gap: '8px',
+            alignItems: 'center'
+          }}>
+            <span style={{ fontSize: '18px' }}>⚠️</span>
+            {errors.api}
+          </div>
+        )}
 
-        <div className={styles.divider}><span>or sign in with email</span></div>
+        <form onSubmit={handleSubmit} noValidate style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ color: '#cbd5e1', fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                backgroundColor: 'rgba(22, 32, 51, 0.6)',
+                border: errors.email ? '1.5px solid rgba(220, 38, 38, 0.5)' : '1.5px solid rgba(45, 55, 72, 0.5)',
+                color: '#e2e8f0',
+                padding: '12px 16px',
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontFamily: 'inherit',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                outline: 'none'
+              }}
+              onFocus={(e) => {
+                if (!errors.email) {
+                  e.target.style.backgroundColor = 'rgba(22, 32, 51, 0.9)';
+                  e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                }
+              }}
+              onBlur={(e) => {
+                e.target.style.backgroundColor = 'rgba(22, 32, 51, 0.6)';
+                e.target.style.borderColor = errors.email ? 'rgba(220, 38, 38, 0.5)' : 'rgba(45, 55, 72, 0.5)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+            {errors.email && <span style={{ fontSize: '13px', color: '#f87171', fontWeight: '500' }}>✕ {errors.email}</span>}
+          </div>
 
-        {errors.api && <div className={styles.apiError}>{errors.api}</div>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ color: '#cbd5e1', fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                backgroundColor: 'rgba(22, 32, 51, 0.6)',
+                border: errors.password ? '1.5px solid rgba(220, 38, 38, 0.5)' : '1.5px solid rgba(45, 55, 72, 0.5)',
+                color: '#e2e8f0',
+                padding: '12px 16px',
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontFamily: 'inherit',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                outline: 'none'
+              }}
+              onFocus={(e) => {
+                if (!errors.password) {
+                  e.target.style.backgroundColor = 'rgba(22, 32, 51, 0.9)';
+                  e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.15)';
+                }
+              }}
+              onBlur={(e) => {
+                e.target.style.backgroundColor = 'rgba(22, 32, 51, 0.6)';
+                e.target.style.borderColor = errors.password ? 'rgba(220, 38, 38, 0.5)' : 'rgba(45, 55, 72, 0.5)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+            {errors.password && <span style={{ fontSize: '13px', color: '#f87171', fontWeight: '500' }}>✕ {errors.password}</span>}
+          </div>
 
-        <form onSubmit={handleSubmit} noValidate>
-          <Input
-            label="Email Address"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="you@email.com"
-            error={errors.email}
-            autoComplete="email"
-            leftIcon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="2"/>
-                <polyline points="22,6 12,13 2,6" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-            }
-          />
-
-          <Input
-            label="Password"
-            name="password"
-            type={showPass ? 'text' : 'password'}
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Your password"
-            error={errors.password}
-            autoComplete="current-password"
-            leftIcon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
-                <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-            }
-            rightIcon={
-              <span onClick={() => setShowPass(v => !v)}>
-                <EyeIcon visible={showPass} />
-              </span>
-            }
-          />
-
-          <Button type="submit" fullWidth size="lg" loading={loading}>
-            Sign In
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              background: loading ? '#1d66e5' : 'linear-gradient(135deg, #2b7fff 0%, #1e6fff 100%)',
+              color: 'white',
+              fontWeight: '600',
+              padding: '14px 20px',
+              borderRadius: '10px',
+              fontSize: '15px',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              opacity: loading ? 0.8 : 1,
+              boxShadow: '0 8px 20px rgba(59, 130, 246, 0.25)',
+              letterSpacing: '0.3px'
+            }}
+            onMouseEnter={(e) => { if (!loading) { e.target.style.background = 'linear-gradient(135deg, #1e6fff 0%, #1555d5 100%)'; e.target.style.boxShadow = '0 12px 28px rgba(59, 130, 246, 0.35)'; } }}
+            onMouseLeave={(e) => { if (!loading) { e.target.style.background = 'linear-gradient(135deg, #2b7fff 0%, #1e6fff 100%)'; e.target.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.25)'; } }}
+            onMouseDown={(e) => { if (!loading) e.target.style.transform = 'scale(0.98)'; }}
+            onMouseUp={(e) => { e.target.style.transform = 'scale(1)'; }}
+          >
+            {loading ? '⏳ Signing in...' : 'Sign In'}
+          </button>
         </form>
 
-        <p className={styles.authFooter}>
-          Don't have an account?{' '}
-          <Link to="/register" className={styles.authLink}>Create one</Link>
-        </p>
+        <div style={{ marginTop: '28px', textAlign: 'center' }}>
+          <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '12px' }}>
+            Don't have an account?
+          </p>
+          <Link to="/register" style={{ 
+            color: '#3b82f6', 
+            fontWeight: '600', 
+            textDecoration: 'none',
+            fontSize: '14px',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            transition: 'all 0.2s ease',
+            display: 'inline-block'
+          }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
+            Create a free account
+          </Link>
+        </div>
       </div>
     </div>
   );
