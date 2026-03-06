@@ -1,0 +1,100 @@
+/* src/components/ui/Button.module.css */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── VARIANTS ── */
+.primary {
+  background: var(--blue);
+  color: #fff;
+}
+.primary:hover {
+  background: var(--blue-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-blue);
+}
+.primary:active { transform: translateY(0); }
+
+.secondary {
+  background: var(--dark3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.secondary:hover {
+  background: var(--dark2);
+  border-color: var(--blue);
+  color: var(--blue-light);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid transparent;
+}
+.ghost:hover {
+  color: var(--text);
+  background: var(--dark3);
+  border-color: var(--border);
+}
+
+.danger {
+  background: rgba(248, 113, 113, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+.danger:hover {
+  background: rgba(248, 113, 113, 0.2);
+}
+
+/* ── SIZES ── */
+.sm  { padding: 6px 12px;  font-size: 12px; border-radius: var(--radius-sm); }
+.md  { padding: 10px 20px; font-size: 14px; }
+.lg  { padding: 14px 28px; font-size: 16px; border-radius: var(--radius-lg); }
+
+/* ── FULL WIDTH ── */
+.fullWidth { width: 100%; }
+
+/* ── LOADING SPINNER ── */
+.loading { cursor: wait; }
+
+.spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── ICON ── */
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+}
