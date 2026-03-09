@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { authService, setAuthToken } from '../services/authService';
+import { authService, setAuthToken, isAuthenticated } from '../services/authService';
 import '../styles/auth.css';
 
 export default function Login() {
@@ -15,10 +15,16 @@ export default function Login() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    // Redirect to dashboard if already authenticated
+    if (isAuthenticated()) {
+      navigate('/dashboard');
+      return;
+    }
+
     if (searchParams.get('registered')) {
       setSuccess('Registration successful! Please log in.');
     }
-  }, [searchParams]);
+  }, [searchParams, navigate]);
 
   const handleChange = (e) => {
     setFormData({
