@@ -16,12 +16,23 @@ public class EmailService {
         this.fromAddress = fromAddress;
     }
 
-    public void sendWelcomeEmail(String toEmail, String name) {
+    // Sends the post-registration onboarding email after a user account is created.
+    public void sendWelcomeEmail(String toEmail, String firstName) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);
         message.setTo(toEmail);
         message.setSubject("Welcome to FitTrack");
-        message.setText("Hi " + name + ",\n\nWelcome to FitTrack. Your account has been created successfully.\n\nStay strong,\nFitTrack Team");
+        message.setText("Hello " + firstName + ",\n\nYour FitTrack account has been successfully created.\n\nStart tracking your workouts today.");
+        mailSender.send(message);
+    }
+
+    // Sends a lightweight notification after the API persists a workout entry.
+    public void sendWorkoutSavedEmail(String toEmail, String firstName) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromAddress);
+        message.setTo(toEmail);
+        message.setSubject("Workout Saved");
+        message.setText("Great job!\n\nYour workout has been successfully recorded.\n\nKeep pushing your limits.");
         mailSender.send(message);
     }
 }
