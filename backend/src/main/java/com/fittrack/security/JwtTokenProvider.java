@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.fittrack.entity.User;
+
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 
 @Component
 public class JwtTokenProvider {
@@ -31,6 +33,21 @@ public class JwtTokenProvider {
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         return generateTokenFromEmail(username);
+    }
+
+    public String generateTokenForUser(User user) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + jwtExpirationMs);
+
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("userId", user.getId())
+                .claim("role", user.getRole().name().replace("ROLE_", ""))
+                .claim("provider", user.getProvider().name())
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key)
+                .compact();
     }
 
     public String generateTokenFromEmail(String email) {
@@ -61,9 +78,7 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (SignatureException | IllegalArgumentException ex) {
-            return false;
-        } catch (Exception ex) {
+        } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }
     }

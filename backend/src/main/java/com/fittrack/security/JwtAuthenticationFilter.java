@@ -30,11 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")
+                || SecurityContextHolder.getContext().getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // Every protected API request resolves the JWT subject back to the database user.
         String token = authHeader.substring(7);
         if (!jwtUtil.isValid(token)) {
             filterChain.doFilter(request, response);

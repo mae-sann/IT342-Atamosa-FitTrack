@@ -26,14 +26,14 @@ public class FittrackUserDetails implements UserDetails {
     }
 
     public static FittrackUserDetails fromUser(User user) {
-        String roleName = user.getRole().getName().name();
+        String roleName = user.getRole().name();
         String authority = roleName.startsWith("ROLE_") ? roleName : "ROLE_" + roleName;
 
         return new FittrackUserDetails(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getPassword(),
+                user.getPassword() == null ? "" : user.getPassword(),
             List.of(new SimpleGrantedAuthority(authority))
         );
     }
@@ -59,5 +59,25 @@ public class FittrackUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

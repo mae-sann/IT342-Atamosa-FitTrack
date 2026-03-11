@@ -11,9 +11,10 @@ public final class UserMapper {
     public static UserResponseDTO toUserResponse(User user) {
         return new UserResponseDTO(
                 user.getId(),
-                user.getName(),
                 user.getEmail(),
-                user.getRole().getName().name().replace("ROLE_", "")
+                user.getFirstName(),
+                user.getLastName(),
+                user.getRole().name().replace("ROLE_", "")
         );
     }
 }

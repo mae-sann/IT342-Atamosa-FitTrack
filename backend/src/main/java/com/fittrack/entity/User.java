@@ -1,6 +1,8 @@
 package com.fittrack.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,9 +14,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "users")
@@ -36,25 +40,38 @@ public class User {
     @Column(nullable = false, unique = true, length = 120)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RoleType role = RoleType.USER;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
-
-    @Column(name = "role", nullable = false, length = 20)
-    private String legacyRole;
+    private Role roleEntity;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private AuthProvider authProvider = AuthProvider.LOCAL;
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    @Column(name = "provider_id", length = 255)
+    private String providerId;
 
     @Column(name = "is_enabled", nullable = false)
     private boolean enabled = true;
+
+    @OneToMany(mappedBy = "user")
+    private List<Workout> workouts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Goal> goals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -64,13 +81,25 @@ public class User {
 
     @PrePersist
     public void onCreate() {
+        syncLegacyPasswordHash();
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
+        syncLegacyPasswordHash();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    private void syncLegacyPasswordHash() {
+        name = getName();
+        if (passwordHash == null || passwordHash.isBlank()) {
+            passwordHash = password;
+        }
+        if ((password == null || password.isBlank()) && passwordHash != null) {
+            password = passwordHash;
+        }
     }
 
     public Long getId() {
@@ -81,6 +110,7 @@ public class User {
         this.id = id;
     }
 
+    @Transient
     public String getName() {
         if (name != null && !name.isBlank()) {
             return name;
@@ -91,10 +121,10 @@ public class User {
     }
 
     public void setName(String name) {
-        this.name = name;
-
         String safeName = name == null ? "" : name.trim();
         if (safeName.isEmpty()) {
+            this.firstName = "User";
+            this.lastName = "User";
             return;
         }
 
@@ -128,10 +158,7 @@ public class User {
     }
 
     public String getPassword() {
-        if (password != null && !password.isBlank()) {
-            return password;
-        }
-        return passwordHash;
+        return password != null ? password : passwordHash;
     }
 
     public void setPassword(String password) {
@@ -150,31 +177,42 @@ public class User {
         }
     }
 
-    public Role getRole() {
+    public RoleType getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(RoleType role) {
         this.role = role;
-        if (role != null && role.getName() != null) {
-            this.legacyRole = role.getName().name().replace("ROLE_", "");
+        if (roleEntity != null) {
+            roleEntity.setName(toLegacyRoleType(role));
         }
     }
 
-    public String getLegacyRole() {
-        return legacyRole;
+    public Role getRoleEntity() {
+        return roleEntity;
     }
 
-    public void setLegacyRole(String legacyRole) {
-        this.legacyRole = legacyRole;
+    public void setRoleEntity(Role roleEntity) {
+        this.roleEntity = roleEntity;
+        if (roleEntity != null && roleEntity.getName() != null) {
+            this.role = fromLegacyRoleType(roleEntity.getName());
+        }
     }
 
-    public AuthProvider getAuthProvider() {
-        return authProvider;
+    public AuthProvider getProvider() {
+        return provider;
     }
 
-    public void setAuthProvider(AuthProvider authProvider) {
-        this.authProvider = authProvider;
+    public void setProvider(AuthProvider provider) {
+        this.provider = provider;
+    }
+
+    public String getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     public boolean isEnabled() {
@@ -183,6 +221,41 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    private RoleType toLegacyRoleType(RoleType roleType) {
+        return roleType == RoleType.ADMIN || roleType == RoleType.ROLE_ADMIN
+                ? RoleType.ROLE_ADMIN
+                : RoleType.ROLE_USER;
+    }
+
+    private RoleType fromLegacyRoleType(RoleType roleType) {
+        return roleType == RoleType.ROLE_ADMIN ? RoleType.ADMIN
+                : roleType == RoleType.ROLE_USER ? RoleType.USER : roleType;
+    }
+
+    public List<Workout> getWorkouts() {
+        return workouts;
+    }
+
+    public void setWorkouts(List<Workout> workouts) {
+        this.workouts = workouts;
+    }
+
+    public List<Goal> getGoals() {
+        return goals;
+    }
+
+    public void setGoals(List<Goal> goals) {
+        this.goals = goals;
+    }
+
+    public List<RefreshToken> getRefreshTokens() {
+        return refreshTokens;
+    }
+
+    public void setRefreshTokens(List<RefreshToken> refreshTokens) {
+        this.refreshTokens = refreshTokens;
     }
 
     public LocalDateTime getCreatedAt() {

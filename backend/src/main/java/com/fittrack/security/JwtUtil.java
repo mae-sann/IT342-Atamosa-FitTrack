@@ -3,6 +3,8 @@ package com.fittrack.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.fittrack.entity.User;
+
 @Component
 public class JwtUtil {
 
@@ -14,6 +16,11 @@ public class JwtUtil {
 
     public String createToken(Authentication authentication) {
         return jwtTokenProvider.generateToken(authentication);
+    }
+
+    // Used by both local login and OAuth2 login once the backend has resolved the user.
+    public String createToken(User user) {
+        return jwtTokenProvider.generateTokenForUser(user);
     }
 
     public String createTokenFromEmail(String email) {
