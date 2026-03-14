@@ -6,42 +6,33 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "workouts")
-public class Workout {
+@Table(name = "exercises")
+public class Exercise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
-    private String title;
+    @Column(nullable = false, unique = true, length = 150)
+    private String name;
 
     @Column(length = 500)
-    private String notes;
+    private String description;
 
-    @Column(name = "performed_at", nullable = false)
-    private LocalDateTime performedAt;
+    @Column(name = "muscle_group", length = 100)
+    private String muscleGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "workout")
-    @OrderBy("loggedAt DESC, id DESC")
-    private List<WorkoutLog> logs = new ArrayList<>();
+    @OneToMany(mappedBy = "exercise")
+    private List<WorkoutLog> workoutLogs = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -52,9 +43,6 @@ public class Workout {
     @PrePersist
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
-        if (performedAt == null) {
-            performedAt = now;
-        }
         createdAt = now;
         updatedAt = now;
     }
@@ -72,44 +60,36 @@ public class Workout {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getDescription() {
+        return description;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public LocalDateTime getPerformedAt() {
-        return performedAt;
+    public String getMuscleGroup() {
+        return muscleGroup;
     }
 
-    public void setPerformedAt(LocalDateTime performedAt) {
-        this.performedAt = performedAt;
+    public void setMuscleGroup(String muscleGroup) {
+        this.muscleGroup = muscleGroup;
     }
 
-    public User getUser() {
-        return user;
+    public List<WorkoutLog> getWorkoutLogs() {
+        return workoutLogs;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<WorkoutLog> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(List<WorkoutLog> logs) {
-        this.logs = logs;
+    public void setWorkoutLogs(List<WorkoutLog> workoutLogs) {
+        this.workoutLogs = workoutLogs;
     }
 
     public LocalDateTime getCreatedAt() {
