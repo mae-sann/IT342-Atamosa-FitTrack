@@ -1,3 +1,8 @@
+CREATE TABLE IF NOT EXISTS roles (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(20) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -7,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT,
     password_hash TEXT,
     role VARCHAR(20),
-    role_id BIGINT,
+    role_id BIGINT REFERENCES roles(id),
     provider VARCHAR(20),
     provider_id VARCHAR(255),
     is_enabled BOOLEAN NOT NULL DEFAULT TRUE,

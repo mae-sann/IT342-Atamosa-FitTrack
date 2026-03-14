@@ -27,7 +27,10 @@ web/.vscode/
 
 # Environment
 .env
+backend/.env
+web/.env
 .env.local
+web/.env.local
 .env.*.local
 
 # OS
