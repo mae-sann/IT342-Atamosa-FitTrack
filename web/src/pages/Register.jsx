@@ -90,7 +90,7 @@ export default function Register() {
 
       <div className="relative z-10 w-full max-w-lg mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mt-6 mb-8">
           <a href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@ export default function Register() {
             <span className="bebas text-3xl tracking-wider text-white">FitTrack</span>
           </a>
           <h1 className="bebas text-4xl text-white">Create Your Account</h1>
-          <p className="text-gray-400 mt-1 text-sm">Start tracking your fitness journey today — it's free!</p>
+          <p className="text-gray-400 mt-1 mb-4 text-sm">Start tracking your fitness journey today — it's free!</p>
         </div>
 
         {/* Glass card */}
@@ -170,7 +170,7 @@ export default function Register() {
                   className="input-field pl-11"
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1.5">Must be at least 8 characters long</p>
+              <p className="text-xs text-gray-500 mt-3">Must be at least 8 characters long</p>
             </div>
 
             {/* Confirm Password */}

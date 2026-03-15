@@ -45,7 +45,18 @@ export default function Login() {
       const response = await authService.login(formData.email, formData.password);
       if (response.data && response.data.token) {
         setAuthToken(response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        const backendUser = response.data.user || {};
+        const normalizedName = (backendUser.name || '').trim();
+        const normalizedUser = {
+          ...backendUser,
+          firstName: backendUser.firstName || normalizedName.split(' ')[0] || '',
+          lastName:
+            backendUser.lastName ||
+            normalizedName.split(' ').slice(1).join(' ') ||
+            backendUser.firstName ||
+            '',
+        };
+        localStorage.setItem('user', JSON.stringify(normalizedUser));
         navigate('/dashboard');
       }
     } catch (err) {
@@ -80,42 +91,54 @@ export default function Login() {
             <span className="bebas text-3xl tracking-wider text-white">FitTrack</span>
           </a>
           <h1 className="bebas text-4xl text-white">Welcome Back</h1>
-          <p className="text-gray-400 mt-1 text-sm">Log in to continue your fitness journey</p>
+          <p className="text-gray-400 mt-1 mb-4 text-sm">Log in to continue your fitness journey</p>
         </div>
 
         {/* Glass card */}
         <div className="glass rounded-2xl p-8">
           <form onSubmit={handleSubmit}>
-            {/* Email */}
-            <div className="mb-5">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">Email Address</label>
-              <div className="relative">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="input-field pl-11"
-                />
-              </div>
+           {/* Email */}
+          <div className="mb-5">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Email Address</label>
+            <div className="relative">
+              <svg
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 z-10"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                style={{ pointerEvents: 'none' }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <input
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="input-field pl-11"
+              />
             </div>
+          </div>
 
             {/* Password */}
             <div className="mb-2">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
               <div className="relative">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 z-10"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  style={{ pointerEvents: 'none' }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
                 <input
                   type="password"
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -168,9 +191,9 @@ export default function Login() {
 
           {/* New here? */}
           <div className="divider mt-6"><span>new here?</span></div>
-          <p className="text-center text-sm text-gray-400">
-            Don't have an account?
-            <a href="/register" className="text-blue-400 hover:text-blue-300 font-semibold transition ml-1">Create one free →</a>
+          <p className="text-center text-sm text-gray-400 inline-flex items-center justify-center gap-2 w-full">
+            <span>Don't have an account?</span>
+            <a href="/register" className="text-blue-400 hover:text-blue-300 font-semibold transition">Create one free →</a>
           </p>
         </div>
 
