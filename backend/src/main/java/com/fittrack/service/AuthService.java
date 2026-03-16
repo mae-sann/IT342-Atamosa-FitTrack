@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fittrack.dto.AuthResponseDTO;
 import com.fittrack.dto.LoginRequestDTO;
+import com.fittrack.dto.OAuthLoginResponseDTO;
 import com.fittrack.dto.RegisterRequestDTO;
 import com.fittrack.dto.UserResponseDTO;
 import com.fittrack.entity.AuthProvider;
@@ -23,7 +24,6 @@ import com.fittrack.entity.RoleType;
 import com.fittrack.entity.User;
 import com.fittrack.repository.RoleRepository;
 import com.fittrack.repository.UserRepository;
-import com.fittrack.security.JwtUtil;
 import com.fittrack.util.DuplicateEmailException;
 import com.fittrack.util.GoogleTokenVerifier;
 import com.fittrack.util.UnauthorizedException;
@@ -40,7 +40,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
     private final EmailService emailService;
     private final GoogleTokenVerifier googleTokenVerifier;
 
@@ -49,7 +49,7 @@ public class AuthService {
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            JwtUtil jwtUtil,
+            JwtService jwtService,
             EmailService emailService,
             GoogleTokenVerifier googleTokenVerifier
     ) {
@@ -57,7 +57,7 @@ public class AuthService {
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
         this.emailService = emailService;
         this.googleTokenVerifier = googleTokenVerifier;
     }
@@ -90,7 +90,7 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(request.email().trim().toLowerCase(), request.password())
             );
 
-            String token = jwtUtil.createToken(authentication);
+                String token = jwtService.generateToken(authentication);
             User user = userRepository.findByEmail(authentication.getName())
                     .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
@@ -102,6 +102,14 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDTO loginWithGoogle(String idToken) {
+        OAuthLoginResponseDTO oauthResponse = loginWithGoogleTokenResponse(idToken);
+        User user = userRepository.findByProviderAndProviderId(AuthProvider.GOOGLE, oauthResponse.provider_id())
+            .orElseThrow(() -> new UnauthorizedException("Google user not found after login"));
+        return new AuthResponseDTO(oauthResponse.token(), UserMapper.toUserResponse(user));
+        }
+
+        @Transactional
+        public OAuthLoginResponseDTO loginWithGoogleTokenResponse(String idToken) {
         GoogleIdToken.Payload payload = googleTokenVerifier.verify(idToken);
 
         User user = upsertGoogleUser(Map.of(
@@ -112,14 +120,23 @@ public class AuthService {
                 "family_name", payload.get("family_name")
         ));
 
-        String token = jwtUtil.createToken(user);
-        return new AuthResponseDTO(token, UserMapper.toUserResponse(user));
+        String token = jwtService.generateToken(user);
+        return toOAuthResponse(token, user);
     }
 
     @Transactional
     public AuthResponseDTO loginWithGoogleProfile(Map<String, Object> attributes) {
+        OAuthLoginResponseDTO oauthResponse = loginWithGoogleProfileResponse(attributes);
+        User user = userRepository.findByProviderAndProviderId(AuthProvider.GOOGLE, oauthResponse.provider_id())
+                .orElseThrow(() -> new UnauthorizedException("Google user not found after login"));
+        return new AuthResponseDTO(oauthResponse.token(), UserMapper.toUserResponse(user));
+    }
+
+    @Transactional
+    public OAuthLoginResponseDTO loginWithGoogleProfileResponse(Map<String, Object> attributes) {
         User user = upsertGoogleUser(attributes);
-        return new AuthResponseDTO(jwtUtil.createToken(user), UserMapper.toUserResponse(user));
+        String token = jwtService.generateToken(user);
+        return toOAuthResponse(token, user);
     }
 
     private void sendWelcomeEmailSafely(User user) {
@@ -147,9 +164,35 @@ public class AuthService {
                 extractLastName(getAttribute(attributes, "name"))
         );
 
+        if (providerId != null && !providerId.isBlank()) {
+            return userRepository.findByProviderAndProviderId(AuthProvider.GOOGLE, providerId)
+                    .map(existingGoogleUser -> touchGoogleUser(existingGoogleUser, givenName, familyName, normalizedEmail))
+                    .orElseGet(() -> userRepository.findByEmail(normalizedEmail)
+                            .map(existingEmailUser -> linkGoogleAccount(existingEmailUser, providerId, givenName, familyName))
+                            .orElseGet(() -> createGoogleUser(normalizedEmail, providerId, givenName, familyName)));
+        }
+
         return userRepository.findByEmail(normalizedEmail)
                 .map(existingUser -> linkGoogleAccount(existingUser, providerId, givenName, familyName))
                 .orElseGet(() -> createGoogleUser(normalizedEmail, providerId, givenName, familyName));
+    }
+
+    private User touchGoogleUser(User existingGoogleUser, String givenName, String familyName, String email) {
+        if (existingGoogleUser.getFirstName() == null || existingGoogleUser.getFirstName().isBlank()) {
+            existingGoogleUser.setFirstName(firstNonBlank(givenName, "Google"));
+        }
+        if (existingGoogleUser.getLastName() == null || existingGoogleUser.getLastName().isBlank()) {
+            existingGoogleUser.setLastName(firstNonBlank(familyName, "User"));
+        }
+        if (existingGoogleUser.getEmail() == null || existingGoogleUser.getEmail().isBlank()) {
+            existingGoogleUser.setEmail(email);
+        }
+        existingGoogleUser.setProvider(AuthProvider.GOOGLE);
+        existingGoogleUser.setEnabled(true);
+        if (existingGoogleUser.getRoleEntity() == null) {
+            existingGoogleUser.setRoleEntity(resolveLegacyRoleEntity(existingGoogleUser.getRole()));
+        }
+        return userRepository.save(existingGoogleUser);
     }
 
     private User linkGoogleAccount(User existingUser, String providerId, String givenName, String familyName) {
@@ -229,5 +272,18 @@ public class AuthService {
             return primary.trim();
         }
         return fallback;
+    }
+
+    private OAuthLoginResponseDTO toOAuthResponse(String token, User user) {
+        String normalizedRole = user.getRole() == RoleType.ADMIN || user.getRole() == RoleType.ROLE_ADMIN
+                ? "ADMIN"
+                : "USER";
+
+        return new OAuthLoginResponseDTO(
+                token,
+                AuthProvider.GOOGLE.name(),
+                user.getProviderId(),
+                normalizedRole
+        );
     }
 }

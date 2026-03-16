@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fittrack.dto.AuthResponseDTO;
 import com.fittrack.dto.GoogleOAuthRequestDTO;
 import com.fittrack.dto.LoginRequestDTO;
+import com.fittrack.dto.OAuthLoginResponseDTO;
 import com.fittrack.dto.RegisterRequestDTO;
 import com.fittrack.dto.UserResponseDTO;
 import com.fittrack.service.AuthService;
@@ -52,8 +53,8 @@ public class AuthController {
     }
 
     @PostMapping("/oauth/google")
-    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@Valid @RequestBody GoogleOAuthRequestDTO request) {
-        return ResponseEntity.ok(authService.loginWithGoogle(request.idToken()));
+    public ResponseEntity<OAuthLoginResponseDTO> loginWithGoogle(@Valid @RequestBody GoogleOAuthRequestDTO request) {
+        return ResponseEntity.ok(authService.loginWithGoogleTokenResponse(request.idToken()));
     }
 
     @PostMapping("/logout")
