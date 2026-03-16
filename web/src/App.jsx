@@ -3,6 +3,7 @@ import { isAuthenticated } from './services/authService';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import OAuth2Callback from './pages/OAuth2Callback';
 import './App.css';
 
 // Protected Route Component
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/oauth2/callback" element={<OAuth2Callback />} />
         <Route
           path="/dashboard"
           element={
