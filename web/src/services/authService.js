@@ -42,6 +42,25 @@ export const authService = {
 
   deleteUser: (userId) =>
     apiClient.delete(`/api/users/${userId}`),
+
+  addExerciseSelection: (exercise) => {
+    const selectedExercises = JSON.parse(localStorage.getItem('selected_workout_exercises') || '[]');
+    const alreadySelected = selectedExercises.some((selected) => selected.id === exercise.id);
+
+    if (!alreadySelected) {
+      selectedExercises.push(exercise);
+      localStorage.setItem('selected_workout_exercises', JSON.stringify(selectedExercises));
+    }
+
+    return selectedExercises;
+  },
+
+  getExerciseSelections: () =>
+    JSON.parse(localStorage.getItem('selected_workout_exercises') || '[]'),
+
+  clearExerciseSelections: () => {
+    localStorage.removeItem('selected_workout_exercises');
+  },
 };
 
 export const setAuthToken = (token) => {

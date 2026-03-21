@@ -66,6 +66,7 @@ h6 {
   font-weight: 600;
 }
 
+/* Reset button styles - but keep filter-pill and add-btn exceptions */
 button {
   border: none;
   border-radius: 8px;
@@ -100,6 +101,33 @@ button:disabled {
   opacity: 0.5;
 }
 
+/* Exceptions for filter pills and add buttons - these should NOT have the default button styles */
+button.filter-pill,
+button.add-btn,
+.filter-pill,
+.add-btn {
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transform: none;
+  box-shadow: none;
+}
+
+button.filter-pill:hover,
+button.add-btn:hover,
+.filter-pill:hover,
+.add-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Keep filter-pill active state */
+button.filter-pill.active {
+  background: #2563EB !important;
+}
+
 input,
 textarea,
 select {
@@ -124,6 +152,11 @@ select:focus {
 
 input::placeholder {
   color: var(--secondary-text);
+}
+
+/* Exception for search input - should use dashboard.css styles */
+input.input-search {
+  all: revert;
 }
 
 /* Scrollbar Styling */

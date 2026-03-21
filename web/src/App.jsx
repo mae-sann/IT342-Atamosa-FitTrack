@@ -3,6 +3,7 @@ import { isAuthenticated } from './services/authService';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Exercises from './pages/Exercises';
 import OAuth2Callback from './pages/OAuth2Callback';
 import './App.css';
 
@@ -23,6 +24,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/exercises"
+          element={
+            <ProtectedRoute>
+              <Exercises />
             </ProtectedRoute>
           }
         />
