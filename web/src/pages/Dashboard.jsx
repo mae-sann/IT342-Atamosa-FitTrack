@@ -105,6 +105,14 @@ export default function Dashboard() {
             </svg>
             Exercise Library
           </Link>
+          {user.role === 'ADMIN' && (
+            <Link to="/admin" className="nav-item">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-2.21 0-4 1.79-4 4v6h8v-6c0-2.21-1.79-4-4-4zM7 10V7a5 5 0 0110 0v3" />
+              </svg>
+              Admin Dashboard
+            </Link>
+          )}
           <a href="#" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />

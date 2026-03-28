@@ -135,7 +135,7 @@ export default function Exercises() {
 
 		return exercises.filter((exercise) => {
 			const exerciseName = (exercise.name || '').toLowerCase();
-			const categoryKey = normalizeCategory(exercise.category);
+			const categoryKey = normalizeCategory(exercise.muscle_group);
 			const categoryMatch = selectedCategoryKey === 'general' || categoryKey === selectedCategoryKey;
 			const nameMatch = !normalizedQuery || exerciseName.includes(normalizedQuery);
 
@@ -152,7 +152,7 @@ export default function Exercises() {
 		authService.addExerciseSelection({
 			id: exercise.id,
 			name: exercise.name,
-			category: exercise.category,
+			muscle_group: exercise.muscle_group,
 			description: exercise.description,
 		});
 
@@ -206,6 +206,14 @@ export default function Exercises() {
 						</svg>
 						Exercise Library
 					</Link>
+					{user?.role === 'ADMIN' && (
+						<Link to="/admin" className="nav-item">
+							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-2.21 0-4 1.79-4 4v6h8v-6c0-2.21-1.79-4-4-4zM7 10V7a5 5 0 0110 0v3" />
+							</svg>
+							Admin Dashboard
+						</Link>
+					)}
 					<Link to="/create-workout" className="nav-item">
 						<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -270,7 +278,6 @@ export default function Exercises() {
 
 				{/* Search + Filter Row */}
 					<div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-6 w-full">
-					{/* Search input - THIS WILL NOW EXPAND */}
 					<div className="relative flex-1 w-full">
 						<input
 						type="text"
@@ -302,12 +309,12 @@ export default function Exercises() {
 					{filteredExercises.length > 0 ? (
 						<div className="exercise-grid">
 							{filteredExercises.map((exercise) => {
-								const categoryKey = normalizeCategory(exercise.category);
+								const categoryKey = normalizeCategory(exercise.muscle_group);
 								const categoryStyle = CATEGORY_STYLES[categoryKey] || CATEGORY_STYLES.general;
 
 								return (
 									<div
-										key={exercise.id ?? `${exercise.name}-${exercise.category}`}
+										key={exercise.id ?? `${exercise.name}-${exercise.muscle_group}`}
 										className="exercise-card"
 									>
 										<div className="flex items-start justify-between mb-3">

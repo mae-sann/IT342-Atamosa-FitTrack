@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService, setAuthToken } from '../services/authService';
 
+const getRouteByRole = (role) => {
+  const normalized = String(role || '').toUpperCase();
+  return normalized === 'ADMIN' || normalized === 'ROLE_ADMIN' ? '/admin' : '/dashboard';
+};
+
 export default function OAuth2Callback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -22,7 +27,13 @@ export default function OAuth2Callback() {
 
         const userResponse = await authService.getCurrentUser();
         if (userResponse?.data) {
-          localStorage.setItem('user', JSON.stringify(userResponse.data));
+          const normalizedUser = {
+            ...userResponse.data,
+            role: String(userResponse.data.role || '').toUpperCase(),
+          };
+          localStorage.setItem('user', JSON.stringify(normalizedUser));
+          navigate(getRouteByRole(normalizedUser.role), { replace: true });
+          return;
         }
 
         navigate('/dashboard', { replace: true });

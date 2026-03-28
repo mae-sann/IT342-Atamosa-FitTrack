@@ -4,12 +4,31 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Exercises from './pages/Exercises';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import OAuth2Callback from './pages/OAuth2Callback';
 import './App.css';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
   return isAuthenticated() ? children : <Navigate to="/login" />;
+}
+
+function isAdmin() {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user?.role;
+    return role === 'ADMIN' || role === 'ROLE_ADMIN';
+  } catch {
+    return false;
+  }
+}
+
+function AdminRoute({ children }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" />;
+  }
+
+  return isAdmin() ? children : <Navigate to="/dashboard" />;
 }
 
 function App() {
@@ -33,6 +52,14 @@ function App() {
             <ProtectedRoute>
               <Exercises />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
           }
         />
         <Route path="/" element={<Navigate to="/login" />} />

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear FitTrack Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .danger {
+            background: #f44336;
+        }
+        .danger:hover {
+            background: #da190b;
+        }
+        .success {
+            color: green;
+            margin-top: 20px;
+            display: none;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear FitTrack Storage</h1>
+        <p>This page will clear your stored authentication tokens and user data.</p>
+        
+        <h3>Current Storage:</h3>
+        <pre id="currentStorage"></pre>
+        
+        <button onclick="clearStorage()" class="danger">Clear All Storage</button>
+        <button onclick="location.href='http://localhost:5173'">Go to FitTrack</button>
+        
+        <div class="success" id="successMsg">
+            ✅ Storage cleared! You can now close this page and refresh your app.
+        </div>
+    </div>
+
+    <script>
+        function displayStorage() {
+            const storage = {
+                jwt_token: localStorage.getItem('jwt_token') ? 'EXISTS (hidden)' : 'not set',
+                user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : 'not set'
+            };
+            document.getElementById('currentStorage').textContent = JSON.stringify(storage, null, 2);
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user');
+            localStorage.clear();
+            document.getElementById('successMsg').style.display = 'block';
+            displayStorage();
+        }
+
+        displayStorage();
+    </script>
+</body>
+</html>

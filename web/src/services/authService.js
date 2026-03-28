@@ -43,6 +43,21 @@ export const authService = {
   deleteUser: (userId) =>
     apiClient.delete(`/api/users/${userId}`),
 
+  getAllUsers: () =>
+    apiClient.get('/api/users'),
+
+  getExercises: () =>
+    apiClient.get('/api/v1/exercises'),
+
+  createExercise: (payload) =>
+    apiClient.post('/api/v1/exercises', payload),
+
+  updateExercise: (exerciseId, payload) =>
+    apiClient.put(`/api/v1/exercises/${exerciseId}`, payload),
+
+  deleteExercise: (exerciseId) =>
+    apiClient.delete(`/api/v1/exercises/${exerciseId}`),
+
   addExerciseSelection: (exercise) => {
     const selectedExercises = JSON.parse(localStorage.getItem('selected_workout_exercises') || '[]');
     const alreadySelected = selectedExercises.some((selected) => selected.id === exercise.id);

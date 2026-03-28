@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { authService, isAuthenticated } from '../services/authService';
 import '../styles/auth.css';
 
+const getRouteByRole = (role) => {
+  const normalized = String(role || '').toUpperCase();
+  return normalized === 'ADMIN' || normalized === 'ROLE_ADMIN' ? '/admin' : '/dashboard';
+};
+
 export default function Register() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -22,7 +27,12 @@ export default function Register() {
     const verifyAuth = async () => {
       if (isAuthenticated()) {
         try {
-          await authService.getCurrentUser();
+          const userResponse = await authService.getCurrentUser();
+          if (userResponse?.data) {
+            localStorage.setItem('user', JSON.stringify(userResponse.data));
+            navigate(getRouteByRole(userResponse.data.role));
+            return;
+          }
           navigate('/dashboard');
         } catch {
           authService.logout();
@@ -139,7 +149,7 @@ export default function Register() {
             <div className="mb-5">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Email Address</label>
               <div className="relative">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="auth-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 <input
@@ -149,7 +159,7 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="input-field pl-11"
+                  className="input-field auth-input-with-icon"
                 />
               </div>
             </div>
@@ -158,7 +168,7 @@ export default function Register() {
             <div className="mb-5">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
               <div className="relative">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="auth-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
                 <input
@@ -168,7 +178,7 @@ export default function Register() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="input-field pl-11"
+                  className="input-field auth-input-with-icon"
                 />
               </div>
               <p className="text-xs text-gray-500 mt-3">Must be at least 8 characters long</p>
@@ -178,7 +188,7 @@ export default function Register() {
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Confirm Password</label>
               <div className="relative">
-                <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="auth-input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                 </svg>
                 <input
@@ -188,7 +198,7 @@ export default function Register() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="input-field pl-11"
+                  className="input-field auth-input-with-icon"
                 />
               </div>
             </div>

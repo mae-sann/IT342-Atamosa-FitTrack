@@ -3,6 +3,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService, setAuthToken, isAuthenticated } from '../services/authService';
 import '../styles/auth.css';
 
+const getRouteByRole = (role) => {
+  const normalized = String(role || '').toUpperCase();
+  return normalized === 'ADMIN' || normalized === 'ROLE_ADMIN' ? '/admin' : '/dashboard';
+};
+
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -15,7 +20,12 @@ export default function Login() {
     const verifyAuth = async () => {
       if (isAuthenticated()) {
         try {
-          await authService.getCurrentUser();
+          const userResponse = await authService.getCurrentUser();
+          if (userResponse?.data) {
+            localStorage.setItem('user', JSON.stringify(userResponse.data));
+            navigate(getRouteByRole(userResponse.data.role));
+            return;
+          }
           navigate('/dashboard');
         } catch {
           authService.logout();
@@ -49,6 +59,7 @@ export default function Login() {
         const normalizedName = (backendUser.name || '').trim();
         const normalizedUser = {
           ...backendUser,
+          role: String(backendUser.role || '').toUpperCase(),
           firstName: backendUser.firstName || normalizedName.split(' ')[0] || '',
           lastName:
             backendUser.lastName ||
@@ -57,7 +68,7 @@ export default function Login() {
             '',
         };
         localStorage.setItem('user', JSON.stringify(normalizedUser));
-        navigate('/dashboard');
+        navigate(getRouteByRole(normalizedUser.role));
       }
     } catch (err) {
       if (err.response?.status === 401) {
@@ -103,11 +114,10 @@ export default function Login() {
             <label className="block text-sm font-semibold text-gray-300 mb-2">Email Address</label>
             <div className="relative">
               <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 z-10"
+                className="auth-input-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                style={{ pointerEvents: 'none' }}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
@@ -118,7 +128,7 @@ export default function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="input-field pl-11"
+                className="input-field auth-input-with-icon"
               />
             </div>
           </div>
@@ -128,11 +138,10 @@ export default function Login() {
               <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
               <div className="relative">
                 <svg 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 z-10"
+                  className="auth-input-icon"
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
-                  style={{ pointerEvents: 'none' }}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
@@ -143,7 +152,7 @@ export default function Login() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="input-field pl-11"
+                  className="input-field auth-input-with-icon"
                 />
               </div>
             </div>
