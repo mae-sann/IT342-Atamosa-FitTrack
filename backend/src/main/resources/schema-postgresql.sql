@@ -67,4 +67,6 @@ CREATE TABLE IF NOT EXISTS workout_logs (
 
 CREATE INDEX IF NOT EXISTS idx_workouts_user_id ON workouts(user_id);
 CREATE INDEX IF NOT EXISTS idx_workout_logs_workout_id ON workout_logs(workout_id);
+-- Backward-compatible fix for older schemas where workout_logs was created without exercise_id.
+ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS exercise_id BIGINT;
 CREATE INDEX IF NOT EXISTS idx_workout_logs_exercise_id ON workout_logs(exercise_id);
