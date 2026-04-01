@@ -1,15 +1,11 @@
 package com.fittrack.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record WorkoutResponseDTO(
         Long id,
-        String title,
-        String notes,
-        LocalDateTime performedAt,
+        LocalDateTime workoutDate,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        List<WorkoutLogResponseDTO> logs
+        Integer totalExercises
 ) {
 }

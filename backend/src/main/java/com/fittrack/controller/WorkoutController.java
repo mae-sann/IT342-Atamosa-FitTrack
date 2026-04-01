@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,5 +57,14 @@ public class WorkoutController {
                 "message", "Workout saved successfully",
                 "item", savedWorkout
         ));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> deleteWorkout(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
+        workoutService.deleteWorkout(authentication.getName(), id);
+        return ResponseEntity.ok(Map.of("message", "Workout deleted successfully"));
     }
 }

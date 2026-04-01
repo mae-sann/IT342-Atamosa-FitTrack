@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.fittrack.entity.Workout;
 
 public interface WorkoutRepository extends JpaRepository<Workout, Long> {
-    @EntityGraph(attributePaths = { "logs", "logs.exercise" })
-    List<Workout> findByUserEmailOrderByPerformedAtDesc(String email);
+    @EntityGraph(attributePaths = { "logs" })
+    List<Workout> findByUserEmailOrderByWorkoutDateDesc(String email);
 
-    @EntityGraph(attributePaths = { "logs", "logs.exercise" })
+    @EntityGraph(attributePaths = { "logs" })
     Optional<Workout> findByIdAndUserEmail(Long id, String email);
 }

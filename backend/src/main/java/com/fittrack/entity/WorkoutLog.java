@@ -1,6 +1,5 @@
 package com.fittrack.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,47 +25,28 @@ public class WorkoutLog {
     @JoinColumn(name = "workout_id", nullable = false)
     private Workout workout;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "exercise_id", nullable = false)
-    private Exercise exercise;
+    @Column(name = "exercise_name", nullable = false, length = 150)
+    private String exerciseName;
 
-    @Column(name = "sets_completed")
-    private Integer setsCompleted;
+    @Column(nullable = false)
+    private Integer sets;
 
-    @Column(name = "reps_completed")
-    private Integer repsCompleted;
+    @Column(nullable = false)
+    private Integer reps;
 
-    @Column(name = "weight_kg", precision = 8, scale = 2)
-    private BigDecimal weightKg;
-
-    @Column(name = "duration_minutes")
-    private Integer durationMinutes;
-
-    @Column(length = 500)
-    private String notes;
-
-    @Column(name = "logged_at", nullable = false)
-    private LocalDateTime loggedAt;
+    @Column(name = "workout_date", nullable = false)
+    private LocalDateTime workoutDate;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     @PrePersist
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
-        if (loggedAt == null) {
-            loggedAt = now;
+        if (workoutDate == null) {
+            workoutDate = now;
         }
         createdAt = now;
-        updatedAt = now;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -86,60 +65,28 @@ public class WorkoutLog {
         this.workout = workout;
     }
 
-    public Exercise getExercise() {
-        return exercise;
+    public String getExerciseName() {
+        return exerciseName;
     }
 
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
+    public void setExerciseName(String exerciseName) {
+        this.exerciseName = exerciseName;
     }
 
-    public Integer getSetsCompleted() {
-        return setsCompleted;
+    public Integer getSets() {
+        return sets;
     }
 
-    public void setSetsCompleted(Integer setsCompleted) {
-        this.setsCompleted = setsCompleted;
+    public void setSets(Integer sets) {
+        this.sets = sets;
     }
 
-    public Integer getRepsCompleted() {
-        return repsCompleted;
+    public Integer getReps() {
+        return reps;
     }
 
-    public void setRepsCompleted(Integer repsCompleted) {
-        this.repsCompleted = repsCompleted;
-    }
-
-    public BigDecimal getWeightKg() {
-        return weightKg;
-    }
-
-    public void setWeightKg(BigDecimal weightKg) {
-        this.weightKg = weightKg;
-    }
-
-    public Integer getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public LocalDateTime getLoggedAt() {
-        return loggedAt;
-    }
-
-    public void setLoggedAt(LocalDateTime loggedAt) {
-        this.loggedAt = loggedAt;
+    public void setReps(Integer reps) {
+        this.reps = reps;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -150,11 +97,11 @@ public class WorkoutLog {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public LocalDateTime getWorkoutDate() {
+        return workoutDate;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setWorkoutDate(LocalDateTime workoutDate) {
+        this.workoutDate = workoutDate;
     }
 }

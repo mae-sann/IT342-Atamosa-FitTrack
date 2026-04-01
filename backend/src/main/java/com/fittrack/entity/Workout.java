@@ -15,7 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,42 +25,27 @@ public class Workout {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
-    private String title;
-
-    @Column(length = 500)
-    private String notes;
-
-    @Column(name = "performed_at", nullable = false)
-    private LocalDateTime performedAt;
+    @Column(name = "workout_date", nullable = false)
+    private LocalDateTime workoutDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "workout")
-    @OrderBy("loggedAt DESC, id DESC")
+    @OrderBy("workoutDate DESC, id DESC")
     private List<WorkoutLog> logs = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     @PrePersist
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
-        if (performedAt == null) {
-            performedAt = now;
+        if (workoutDate == null) {
+            workoutDate = now;
         }
         createdAt = now;
-        updatedAt = now;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -72,28 +56,12 @@ public class Workout {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public LocalDateTime getWorkoutDate() {
+        return workoutDate;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public LocalDateTime getPerformedAt() {
-        return performedAt;
-    }
-
-    public void setPerformedAt(LocalDateTime performedAt) {
-        this.performedAt = performedAt;
+    public void setWorkoutDate(LocalDateTime workoutDate) {
+        this.workoutDate = workoutDate;
     }
 
     public User getUser() {
@@ -120,11 +88,4 @@ public class Workout {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

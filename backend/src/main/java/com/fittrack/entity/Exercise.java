@@ -1,15 +1,12 @@
 package com.fittrack.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -30,9 +27,6 @@ public class Exercise {
 
     @Column(name = "muscle_group", length = 100)
     private String muscleGroup;
-
-    @OneToMany(mappedBy = "exercise")
-    private List<WorkoutLog> workoutLogs = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -82,14 +76,6 @@ public class Exercise {
 
     public void setMuscleGroup(String muscleGroup) {
         this.muscleGroup = muscleGroup;
-    }
-
-    public List<WorkoutLog> getWorkoutLogs() {
-        return workoutLogs;
-    }
-
-    public void setWorkoutLogs(List<WorkoutLog> workoutLogs) {
-        this.workoutLogs = workoutLogs;
     }
 
     public LocalDateTime getCreatedAt() {

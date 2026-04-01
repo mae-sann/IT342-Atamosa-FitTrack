@@ -1,18 +1,29 @@
 package com.fittrack.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
 public record WorkoutSaveRequestDTO(
-        @NotBlank(message = "Workout title is required")
-        @Size(max = 150, message = "Workout title must be at most 150 characters")
-        String title,
+        @NotNull(message = "Workout date is required")
+        LocalDateTime workoutDate,
 
-        @Size(max = 500, message = "Workout notes must be at most 500 characters")
-        String notes,
-
-        LocalDateTime performedAt
+        @Valid
+        List<WorkoutLogSaveRequestDTO> logs
 ) {
+    public record WorkoutLogSaveRequestDTO(
+            @NotBlank(message = "Exercise name is required")
+            String exerciseName,
+
+            @Min(value = 1, message = "Sets must be at least 1")
+            Integer sets,
+
+            @Min(value = 1, message = "Reps must be at least 1")
+            Integer reps
+    ) {
+    }
 }
