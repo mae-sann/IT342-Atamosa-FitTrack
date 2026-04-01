@@ -4,6 +4,8 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Exercises from './pages/Exercises';
+import CreateWorkout from './pages/CreateWorkout';
+import WorkoutHistory from './pages/WorkoutHistory';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import OAuth2Callback from './pages/OAuth2Callback';
 import './App.css';
@@ -60,6 +62,22 @@ function App() {
             <AdminRoute>
               <AdminDashboardPage />
             </AdminRoute>
+          }
+        />
+        <Route
+          path="/create-workout"
+          element={
+            <ProtectedRoute>
+              <CreateWorkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/workout-history"
+          element={
+            <ProtectedRoute>
+              <WorkoutHistory />
+            </ProtectedRoute>
           }
         />
         <Route path="/" element={<Navigate to="/login" />} />

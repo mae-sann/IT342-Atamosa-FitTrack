@@ -3,6 +3,7 @@
 
 # Backend build artifacts
 backend/target/
+backend copy/
 backend/.classpath
 backend/.project
 backend/.settings/

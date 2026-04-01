@@ -113,12 +113,12 @@ export default function Dashboard() {
               Admin Dashboard
             </Link>
           )}
-          <a href="#" className="nav-item">
+          <Link to="/create-workout" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
             Create Workout
-          </a>
+          </Link>
           <a href="#" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -157,12 +157,12 @@ export default function Dashboard() {
             <h1 className="text-xl font-bold text-white">{greeting}, {firstName}! {emoji}</h1>
             <p className="text-sm text-gray-500">{displayDate}</p>
           </div>
-          <a href="#" className="dashboard-primary-button text-white text-sm font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2">
+          <Link to="/create-workout" className="dashboard-primary-button text-white text-sm font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
             </svg>
             New Workout
-          </a>
+          </Link>
         </div>
 
         <div className="p-8">
@@ -271,9 +271,9 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-              <a href="#" className="mt-4 block text-center text-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 py-2.5 rounded-xl transition font-medium">
+              <Link to="/create-workout" className="mt-4 block text-center text-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 py-2.5 rounded-xl transition font-medium">
                 + Log New Workout
-              </a>
+              </Link>
             </div>
           </div>
 
