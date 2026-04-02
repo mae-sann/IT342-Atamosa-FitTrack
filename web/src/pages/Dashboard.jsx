@@ -125,11 +125,11 @@ export default function Dashboard() {
             </svg>
             Workout History
           </a>
-          <a href="#" className="nav-item">
+          <a href="/goals" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Progress
+            Goals
           </a>
 
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2 mt-4">Account</p>
@@ -254,13 +254,15 @@ export default function Dashboard() {
                   workouts.slice(0, 3).map((workout, index) => (
                     <div key={index} className="workout-row">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-white">{workout.name || 'Workout Session'}</span>
-                        <span className="text-xs text-gray-500">{new Date().toLocaleDateString()}</span>
+                        <span className="text-sm font-semibold text-white">{workout.title || 'Workout Session'}</span>
+                        <span className="text-xs text-gray-500">{new Date(workout.workoutDate).toLocaleDateString()}</span>
                       </div>
-                      <div className="text-xs text-gray-400">{workout.description || 'Training workout'}</div>
+                      <div className="text-xs text-gray-400">
+                        {workout.totalExercises || 0} exercise{(workout.totalExercises || 0) === 1 ? '' : 's'}
+                      </div>
                       <div className="flex gap-1 mt-2">
                         <span className="text-xs bg-blue-600/20 text-blue-300 px-2 py-0.5 rounded-full">
-                          {workout.category || 'General'}
+                          Workout
                         </span>
                       </div>
                     </div>

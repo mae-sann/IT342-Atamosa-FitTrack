@@ -226,11 +226,11 @@ export default function Exercises() {
 						</svg>
 						Workout History
 					</Link>
-					<Link to="/progress" className="nav-item">
+					<Link to="/goals" className="nav-item">
 						<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
-						Progress
+						Goals
 					</Link>
 
 					<p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2 mt-4">Account</p>

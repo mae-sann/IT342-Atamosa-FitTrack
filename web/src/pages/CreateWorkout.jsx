@@ -39,6 +39,7 @@ export default function CreateWorkout() {
   const { user: authUser } = useAuth();
 
   const [user, setUser] = useState(authUser || null);
+  const [workoutName, setWorkoutName] = useState('');
   const [workoutDate, setWorkoutDate] = useState(toIsoDate(new Date()));
   const [exercises, setExercises] = useState([]);
   const [availableExercises, setAvailableExercises] = useState([]);
@@ -96,11 +97,12 @@ export default function CreateWorkout() {
     const prefilledExercises = prefillWorkout.logs.map((log, index) => ({
       id: `prefill-${prefillWorkout.id || 'workout'}-${index}-${Date.now()}`,
       exerciseName: log.exerciseName,
-      muscleGroup: 'General',
+      muscleGroup: log.muscleGroup || 'General',
       sets: Number(log.sets) || 1,
       reps: Number(log.reps) || 1,
     }));
 
+    setWorkoutName(prefillWorkout.title || '');
     setWorkoutDate(safeDate);
     setExercises(prefilledExercises);
     showToast('Workout loaded. You can update and save it as a new entry.');
@@ -222,9 +224,11 @@ export default function CreateWorkout() {
     }
 
     const payload = {
+      workoutName: workoutName.trim() || 'Workout Session',
       workoutDate: `${workoutDate}T00:00:00`,
       logs: exercises.map((exercise) => ({
         exerciseName: exercise.exerciseName,
+        muscleGroup: exercise.muscleGroup,
         sets: Number(exercise.sets),
         reps: Number(exercise.reps),
       })),
@@ -300,11 +304,11 @@ export default function CreateWorkout() {
             </svg>
             Workout History
           </Link>
-          <Link to="/progress" className="nav-item">
+          <Link to="/goals" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Progress
+            Goals
           </Link>
 
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2 mt-4">Account</p>
@@ -344,14 +348,26 @@ export default function CreateWorkout() {
           {/* Workout Details Card */}
           <div className="glass rounded-2xl p-6 mb-6">
             <h2 className="text-base font-bold text-white mb-4">Workout Details</h2>
-            <div>
-              <label className="block text-sm font-semibold text-gray-300 mb-2">Workout Date</label>
-              <input
-                type="date"
-                className="input-field w-full"
-                value={workoutDate}
-                onChange={(e) => setWorkoutDate(e.target.value)}
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Workout Name</label>
+                <input
+                  type="text"
+                  className="input-field w-full"
+                  value={workoutName}
+                  onChange={(e) => setWorkoutName(e.target.value)}
+                  placeholder="e.g. Upper Body Blast"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Workout Date</label>
+                <input
+                  type="date"
+                  className="input-field w-full"
+                  value={workoutDate}
+                  onChange={(e) => setWorkoutDate(e.target.value)}
+                />
+              </div>
             </div>
           </div>
 

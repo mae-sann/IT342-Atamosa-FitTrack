@@ -10,16 +10,7 @@ function getCategoryStyle(muscleGroup) {
   if (group.includes('lower')) return { bg: 'bg-emerald-600/20', text: 'text-emerald-300', label: 'Lower Body' };
   if (group.includes('core')) return { bg: 'bg-purple-600/20', text: 'text-purple-300', label: 'Core' };
   if (group.includes('cardio')) return { bg: 'bg-red-600/20', text: 'text-red-300', label: 'Cardio' };
-  return { bg: 'bg-slate-600/20', text: 'text-slate-300', label: 'General' };
-}
-
-function inferGroupFromExerciseName(exerciseName) {
-  const value = (exerciseName || '').toLowerCase();
-  if (/(bench|push|pull|press|curl|row|dip|tricep|bicep|shoulder|chest)/.test(value)) return 'Upper Body';
-  if (/(squat|deadlift|lunge|leg|calf|hamstring|glute)/.test(value)) return 'Lower Body';
-  if (/(plank|crunch|ab|core|twist|sit-up)/.test(value)) return 'Core';
-  if (/(run|cardio|burpee|jump|rope|bike|cycling|jog)/.test(value)) return 'Cardio';
-  return 'General';
+  return { bg: 'bg-gray-600/20', text: 'text-gray-300', label: 'General' };
 }
 
 function formatDisplayDate(value) {
@@ -88,6 +79,40 @@ function toWorkoutName(logs = []) {
   return `${logs[0].exerciseName} +${logs.length - 1} more`;
 }
 
+function inferCategoryFromExerciseName(exerciseName) {
+  const value = (exerciseName || '').toLowerCase();
+  if (/(run|jog|cycling|bike|jump rope|rope|burpee|cardio)/.test(value)) return 'Cardio';
+  if (/(bench|push|pull|row|press|curl|dip|tricep|bicep|shoulder|chest|lat)/.test(value)) return 'Upper Body';
+  if (/(squat|deadlift|lunge|leg|calf|hamstring|glute)/.test(value)) return 'Lower Body';
+  if (/(plank|crunch|core|ab|abs|twist|sit-up|sit up|russian twist)/.test(value)) return 'Core';
+  return 'General';
+}
+
+function normalizeCategory(muscleGroup, exerciseName) {
+  const value = (muscleGroup || '').toLowerCase();
+  if (value.includes('cardio')) return 'Cardio';
+  if (value.includes('upper')) return 'Upper Body';
+  if (value.includes('lower')) return 'Lower Body';
+  if (value.includes('core')) return 'Core';
+
+  return inferCategoryFromExerciseName(exerciseName);
+}
+
+function getPrimaryWorkoutCategory(logs = []) {
+  if (!logs.length) return 'General';
+
+  const counts = logs.reduce((accumulator, log) => {
+    const category = normalizeCategory(log.muscleGroup, log.exerciseName);
+    if (category !== 'General') {
+      accumulator[category] = (accumulator[category] || 0) + 1;
+    }
+    return accumulator;
+  }, {});
+
+  const ranked = Object.entries(counts).sort((left, right) => right[1] - left[1]);
+  return ranked.length ? ranked[0][0] : 'General';
+}
+
 const PAGE_SIZE = 10;
 
 export default function WorkoutHistory() {
@@ -132,7 +157,11 @@ export default function WorkoutHistory() {
       ]);
 
       setUser(userResponse.data);
-      const items = Array.isArray(workoutsResponse.data?.items) ? workoutsResponse.data.items : [];
+      const items = Array.isArray(workoutsResponse.data) 
+        ? workoutsResponse.data 
+        : Array.isArray(workoutsResponse.data?.items) 
+          ? workoutsResponse.data.items 
+          : [];
       setWorkouts(items);
     } catch (requestError) {
       setError('Failed to load workout history. Please try again.');
@@ -152,10 +181,14 @@ export default function WorkoutHistory() {
   const loadWorkoutDetail = async (workoutId) => {
     if (detailCache[workoutId]) return detailCache[workoutId];
 
-    const response = await api.get(`/api/workouts/${workoutId}`);
-    const detail = response.data?.item;
-    setDetailCache((prev) => ({ ...prev, [workoutId]: detail }));
-    return detail;
+    try {
+      const response = await api.get(`/api/workouts/${workoutId}`);
+      const detail = response.data?.item || response.data;
+      setDetailCache((prev) => ({ ...prev, [workoutId]: detail }));
+      return detail;
+    } catch {
+      return null;
+    }
   };
 
   const filteredWorkouts = useMemo(() => {
@@ -166,10 +199,10 @@ export default function WorkoutHistory() {
 
       if (!query) return true;
 
-      const detail = detailCache[workout.id];
-      const workoutName = detail ? toWorkoutName(detail.logs) : `Workout #${workout.id}`;
+      const workoutName = workout.title || toWorkoutName(workout.logs || []);
+      const exerciseText = (workout.logs || []).map((log) => log.exerciseName).join(' ').toLowerCase();
       const dateText = formatDisplayDate(workout.workoutDate).toLowerCase();
-      return workoutName.toLowerCase().includes(query) || dateText.includes(query);
+      return workoutName.toLowerCase().includes(query) || exerciseText.includes(query) || dateText.includes(query);
     });
   }, [workouts, dateFilter, searchQuery, detailCache]);
 
@@ -199,7 +232,7 @@ export default function WorkoutHistory() {
       missingIds.map(async (id) => {
         try {
           const response = await api.get(`/api/workouts/${id}`);
-          return { id, detail: response.data?.item };
+          return { id, detail: response.data?.item || response.data };
         } catch {
           return { id, detail: null };
         }
@@ -218,9 +251,11 @@ export default function WorkoutHistory() {
     return () => {
       cancelled = true;
     };
-  }, [pagedWorkouts, detailCache]);
+  }, [pagedWorkouts]);
 
   const selectedWorkoutDetail = selectedWorkoutId ? detailCache[selectedWorkoutId] : null;
+  const selectedWorkoutLogs = selectedWorkoutDetail?.logs || [];
+  const selectedWorkoutCategory = getPrimaryWorkoutCategory(selectedWorkoutLogs);
 
   const stats = useMemo(() => {
     const totalWorkouts = workouts.length;
@@ -261,25 +296,29 @@ export default function WorkoutHistory() {
   };
 
   const handleEditWorkout = async (workout) => {
-    try {
-      const detail = await loadWorkoutDetail(workout.id);
-      if (!detail) {
-        showToast('Workout details are not available for edit.', 'error');
-        return;
-      }
-
-      navigate('/create-workout', {
-        state: {
-          prefillWorkout: {
-            id: detail.id,
-            workoutDate: detail.workoutDate,
-            logs: Array.isArray(detail.logs) ? detail.logs : [],
-          },
-        },
-      });
-    } catch {
-      showToast('Failed to prepare workout for editing.', 'error');
+    const detail = await loadWorkoutDetail(workout.id);
+    if (!detail) {
+      showToast('Failed to load workout for editing.', 'error');
+      return;
     }
+
+    navigate('/create-workout', {
+      state: {
+        prefillWorkout: {
+          id: detail.id,
+          title: detail.title || workout.title,
+          workoutDate: detail.workoutDate,
+          logs: Array.isArray(detail.logs)
+            ? detail.logs.map((log) => ({
+                exerciseName: log.exerciseName,
+                muscleGroup: log.muscleGroup,
+                sets: log.sets,
+                reps: log.reps,
+              }))
+            : [],
+        },
+      },
+    });
   };
 
   const closeModal = () => {
@@ -364,11 +403,11 @@ export default function WorkoutHistory() {
             </svg>
             Workout History
           </Link>
-          <Link to="/progress" className="nav-item">
+          <Link to="/goals" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Progress
+            Goals
           </Link>
 
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2 mt-4">Account</p>
@@ -396,7 +435,7 @@ export default function WorkoutHistory() {
             <h1 className="text-xl font-bold text-white">Workout History</h1>
             <p className="text-sm text-gray-500">All your logged workout sessions</p>
           </div>
-          <Link to="/create-workout" className="dashboard-primary-button text-white text-sm font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2">
+          <Link to="/create-workout" className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
             </svg>
@@ -414,26 +453,25 @@ export default function WorkoutHistory() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="glass rounded-2xl p-4 text-center">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
               <div className="text-2xl font-black text-white">{stats.totalWorkouts}</div>
               <div className="text-xs text-gray-400 mt-1">Total Workouts</div>
             </div>
-            <div className="glass rounded-2xl p-4 text-center">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
               <div className="text-2xl font-black text-white">{stats.totalExercises}</div>
-              <div className="text-xs text-gray-400 mt-1">Total Exercises Done</div>
+              <div className="text-xs text-gray-400 mt-1">Exercises Done</div>
             </div>
-            <div className="glass rounded-2xl p-4 text-center">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
               <div className="text-2xl font-black text-white">{stats.totalTime}</div>
               <div className="text-xs text-gray-400 mt-1">Total Time</div>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-3 mb-5">
-            <div className="relative flex-1">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+          {/* Search + Filter */}
+          <div className="flex gap-3 mb-5">
+            <div className="flex-1">
               <input
                 type="text"
                 placeholder="Search workouts..."
@@ -442,58 +480,59 @@ export default function WorkoutHistory() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="input-field w-full pl-10"
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-white placeholder-gray-500 text-sm outline-none focus:border-blue-600 transition"
               />
             </div>
             <select
-              className="input-field md:w-52"
+              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-blue-600 transition"
               value={dateFilter}
               onChange={(e) => {
                 setDateFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)' }}
+              style={{ paddingLeft: '16px' }}
             >
-              <option value="All Time" className="bg-[#0A0F1E] text-white">All Time</option>
-              <option value="This Week" className="bg-[#0A0F1E] text-white">This Week</option>
-              <option value="This Month" className="bg-[#0A0F1E] text-white">This Month</option>
-              <option value="Last Month" className="bg-[#0A0F1E] text-white">Last Month</option>
+              <option className="bg-[#0A0F1E] text-white">All Time</option>
+              <option className="bg-[#0A0F1E] text-white">This Week</option>
+              <option className="bg-[#0A0F1E] text-white">This Month</option>
+              <option className="bg-[#0A0F1E] text-white">Last Month</option>
             </select>
           </div>
 
-          <div className="glass rounded-2xl overflow-hidden">
+          {/* Table */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[880px]">
+              <table className="w-full">
                 <thead>
-                  <tr className="bg-white/5 text-xs uppercase tracking-wider text-gray-500">
-                    <th className="text-left px-4 py-3">#</th>
-                    <th className="text-left px-4 py-3">Workout Name</th>
-                    <th className="text-left px-4 py-3">Date</th>
-                    <th className="text-left px-4 py-3">Exercises</th>
-                    <th className="text-left px-4 py-3">Category</th>
-                    <th className="text-left px-4 py-3">Actions</th>
-                   </tr>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">#</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Workout Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Exercises</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Category</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {pagedWorkouts.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-10 text-center text-sm text-gray-400">
+                      <td colSpan="6" className="px-4 py-10 text-center text-sm text-gray-400">
                         No workouts found for your current filter.
                       </td>
                     </tr>
                   ) : (
                     pagedWorkouts.map((workout, index) => {
-                      const detail = detailCache[workout.id];
-                      const logs = detail?.logs || [];
-                      const inferredGroup = logs.length
-                        ? inferGroupFromExerciseName(logs[0].exerciseName)
-                        : 'General';
-                      const categoryStyle = getCategoryStyle(inferredGroup);
-                      const workoutName = logs.length ? toWorkoutName(logs) : `Workout #${workout.id}`;
+                      const logs = workout.logs || detailCache[workout.id]?.logs || [];
+                      const workoutCategory = getPrimaryWorkoutCategory(logs);
+                      const categoryStyle = getCategoryStyle(workoutCategory);
+                      const workoutName = workout.title || (logs.length ? toWorkoutName(logs) : `Workout #${workout.id}`);
+                      const exerciseNames = logs.map((log) => log.exerciseName).join(' · ');
 
                       return (
-                        <tr key={workout.id} className="border-b border-white/5 hover:bg-blue-600/5 transition">
-                          <td className="px-4 py-3 text-xs text-gray-500 font-mono">{workouts.length - ((currentPage - 1) * PAGE_SIZE + index)}</td>
+                        <tr key={workout.id} className="border-b border-white/10 hover:bg-blue-600/5 transition">
+                          <td className="px-4 py-3 text-xs text-gray-500 font-mono">
+                            {workouts.length - ((currentPage - 1) * PAGE_SIZE + index)}
+                          </td>
                           <td className="px-4 py-3 font-semibold text-white">{workoutName}</td>
                           <td className="px-4 py-3">
                             <div className="text-gray-300">{formatDisplayDate(workout.workoutDate)}</div>
@@ -501,7 +540,9 @@ export default function WorkoutHistory() {
                               <div className="text-xs text-gray-500">{formatRelativeDate(workout.workoutDate)}</div>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-300">{workout.totalExercises || 0}</td>
+                          <td className="px-4 py-3 text-xs text-gray-400 max-w-[300px]">
+                            <div className="leading-5 break-words">{exerciseNames || 'No exercises'}</div>
+                          </td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${categoryStyle.bg} ${categoryStyle.text}`}>
                               {categoryStyle.label}
@@ -511,19 +552,19 @@ export default function WorkoutHistory() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleViewWorkout(workout.id)}
-                                className="text-xs bg-white/5 hover:bg-white/10 text-gray-300 px-3 py-1.5 rounded-lg transition"
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 hover:bg-white/10 text-gray-300 transition"
                               >
                                 View
                               </button>
                               <button
                                 onClick={() => handleEditWorkout(workout)}
-                                className="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 px-3 py-1.5 rounded-lg transition"
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 transition"
                               >
                                 Edit
                               </button>
                               <button
                                 onClick={() => handleDeleteWorkout(workout.id)}
-                                className="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-300 px-3 py-1.5 rounded-lg transition"
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600/20 hover:bg-red-600/30 text-red-300 transition"
                               >
                                 Delete
                               </button>
@@ -537,7 +578,8 @@ export default function WorkoutHistory() {
               </table>
             </div>
 
-            <div className="flex items-center justify-between px-4 py-4 border-t border-white/5">
+            {/* Pagination */}
+            <div className="flex items-center justify-between px-4 py-4 border-t border-white/10">
               <span className="text-sm text-gray-400">
                 Showing {pagedWorkouts.length} of {filteredWorkouts.length} workouts
               </span>
@@ -549,9 +591,19 @@ export default function WorkoutHistory() {
                 >
                   ←
                 </button>
-                <span className="px-3 py-1.5 rounded-lg text-sm bg-blue-600 text-white font-bold">
-                  {currentPage}
-                </span>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition ${
+                      currentPage === pageNum
+                        ? 'bg-blue-600 text-white font-bold'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
@@ -565,54 +617,79 @@ export default function WorkoutHistory() {
         </div>
       </main>
 
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center px-4" onClick={closeModal}>
-          <div className="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8 w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-white">
-                {selectedWorkoutDetail ? toWorkoutName(selectedWorkoutDetail.logs) : 'Workout Details'}
-              </h2>
-              <button onClick={closeModal} className="text-gray-500 hover:text-white transition text-2xl leading-none">×</button>
+      {/* View Workout Modal */}
+{modalOpen && (
+  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center px-4" onClick={closeModal}>
+    <div className="bg-[#111827] border border-white/10 rounded-2xl p-6 md:p-8 w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-bold text-white">
+          {selectedWorkoutDetail ? (selectedWorkoutDetail.title || toWorkoutName(selectedWorkoutLogs)) : 'Workout Details'}
+        </h2>
+        <button 
+          onClick={closeModal} 
+          className="!bg-red-600/20 !text-red-400 hover:!bg-red-600/30 hover:!text-red-300 transition-all duration-200 text-xl leading-none w-7 h-7 flex items-center justify-center rounded-full"
+        >
+          ×
+        </button>
+      </div>
+
+      {modalLoading ? (
+        <div className="text-sm text-gray-400">Loading workout details...</div>
+      ) : selectedWorkoutDetail ? (
+        <>
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Workout Name</span>
+              <span className="text-white font-medium">{selectedWorkoutDetail.title || 'Workout Session'}</span>
             </div>
-
-            {modalLoading ? (
-              <div className="text-sm text-gray-400">Loading workout details...</div>
-            ) : selectedWorkoutDetail ? (
-              <>
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-sm"><span className="text-gray-400">Date</span><span className="text-white font-medium">{formatDisplayDate(selectedWorkoutDetail.workoutDate)}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-gray-400">Created At</span><span className="text-white font-medium">{formatDisplayDate(selectedWorkoutDetail.createdAt)}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-gray-400">Total Exercises</span><span className="text-white font-medium">{selectedWorkoutDetail.logs.length}</span></div>
-                </div>
-
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Exercises Performed</h3>
-                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                  {selectedWorkoutDetail.logs.map((log, idx) => (
-                    <div key={`${log.exerciseName}-${idx}`} className="flex justify-between text-sm py-2 border-b border-white/5">
-                      <span className="text-white">{log.exerciseName}</span>
-                      <span className="text-gray-400">{log.sets} sets × {log.reps} reps</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button onClick={closeModal} className="mt-6 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition">
-                  Close
-                </button>
-              </>
-            ) : (
-              <div className="text-sm text-red-300">Workout details not available.</div>
-            )}
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Date</span>
+              <span className="text-white font-medium">{formatDisplayDate(selectedWorkoutDetail.workoutDate)}</span>
+            </div>
+            <div className="flex justify-between items-start text-sm gap-4">
+              <span className="text-gray-400">Category</span>
+              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getCategoryStyle(selectedWorkoutCategory).bg} ${getCategoryStyle(selectedWorkoutCategory).text}`}>
+                {getCategoryStyle(selectedWorkoutCategory).label}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Total Exercises</span>
+              <span className="text-white font-medium">{selectedWorkoutLogs.length}</span>
+            </div>
           </div>
-        </div>
-      )}
 
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Exercises Performed</h3>
+          <div className="space-y-2 max-h-56 overflow-y-auto">
+            {selectedWorkoutLogs.map((log, idx) => (
+              <div key={idx} className="flex justify-between text-sm py-2 border-b border-white/10">
+                <div>
+                  <span className="text-white">{log.exerciseName}</span>
+                  <div className="text-xs text-gray-500">{log.muscleGroup || 'General'}</div>
+                </div>
+                <span className="text-gray-400">{log.sets} sets × {log.reps} reps</span>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={closeModal} className="mt-6 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition">
+            Close
+          </button>
+        </>
+      ) : (
+        <div className="text-sm text-red-300">Workout details not available.</div>
+      )}
+    </div>
+  </div>
+)}
+
+      {/* Toast Notification */}
       <div
         className={`fixed bottom-6 right-6 z-50 text-white text-sm font-semibold px-5 py-3 rounded-xl shadow-lg transition-all duration-300 ${
           toastVisible
             ? toastType === 'error'
               ? 'translate-y-0 opacity-100 bg-red-600'
               : 'translate-y-0 opacity-100 bg-blue-600'
-            : 'translate-y-20 opacity-0 bg-blue-600'
+            : 'translate-y-20 opacity-0'
         }`}
       >
         {toastMessage}
