@@ -14,7 +14,9 @@ public final class UserMapper {
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getRole().name().replace("ROLE_", "")
+                user.getRole().name().replace("ROLE_", ""),
+                user.getProvider().name(),
+                user.getCreatedAt()
         );
     }
 }

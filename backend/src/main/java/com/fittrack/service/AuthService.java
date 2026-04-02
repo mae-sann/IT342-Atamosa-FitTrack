@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fittrack.dto.AuthResponseDTO;
+import com.fittrack.dto.ChangePasswordRequestDTO;
 import com.fittrack.dto.LoginRequestDTO;
 import com.fittrack.dto.OAuthLoginResponseDTO;
 import com.fittrack.dto.RegisterRequestDTO;
@@ -98,6 +99,23 @@ public class AuthService {
         } catch (BadCredentialsException ex) {
             throw new UnauthorizedException("Invalid credentials");
         }
+    }
+
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequestDTO request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+
+        if (user.getProvider() == AuthProvider.GOOGLE) {
+            throw new UnauthorizedException("Password management is not available for Google accounts");
+        }
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new UnauthorizedException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 
     @Transactional
