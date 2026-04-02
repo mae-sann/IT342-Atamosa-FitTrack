@@ -7,6 +7,7 @@ import Exercises from './pages/Exercises';
 import CreateWorkout from './pages/CreateWorkout';
 import WorkoutHistory from './pages/WorkoutHistory';
 import GoalsPage from './pages/GoalsPage';
+import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import OAuth2Callback from './pages/OAuth2Callback';
 import './App.css';
@@ -86,6 +87,14 @@ function App() {
           element={
             <ProtectedRoute>
               <GoalsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />

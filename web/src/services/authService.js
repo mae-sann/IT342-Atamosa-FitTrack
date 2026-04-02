@@ -35,7 +35,13 @@ export const authService = {
   },
 
   getCurrentUser: () =>
-    apiClient.get('/api/users/me'),
+    apiClient.get('/api/v1/users/me'),
+
+  updateProfile: (payload) =>
+    apiClient.put('/api/v1/users/me', payload),
+
+  changePassword: (payload) =>
+    apiClient.post('/api/v1/auth/change-password', payload),
 
   getWorkouts: () =>
     apiClient.get('/api/workouts'),
