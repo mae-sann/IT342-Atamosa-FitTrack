@@ -86,6 +86,7 @@ ALTER TABLE workouts ADD COLUMN IF NOT EXISTS performed_at TIMESTAMP;
 ALTER TABLE workouts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
 
 ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS exercise_id BIGINT;
+ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS muscle_group VARCHAR(100);
 ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS sets_completed INTEGER;
 ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS reps_completed INTEGER;
 ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS weight_kg NUMERIC(8,2);
@@ -110,6 +111,7 @@ SET performed_at = COALESCE(performed_at, workout_date),
 UPDATE workout_logs
 SET logged_at = COALESCE(logged_at, workout_date),
     updated_at = COALESCE(updated_at, created_at),
+    muscle_group = COALESCE(muscle_group, 'General'),
     sets_completed = COALESCE(sets_completed, sets),
     reps_completed = COALESCE(reps_completed, reps);
 

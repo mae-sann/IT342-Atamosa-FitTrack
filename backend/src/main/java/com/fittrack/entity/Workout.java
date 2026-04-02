@@ -28,6 +28,9 @@ public class Workout {
     @Column(name = "workout_date", nullable = false)
     private LocalDateTime workoutDate;
 
+    @Column(name = "title", length = 150)
+    private String title;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -62,6 +65,14 @@ public class Workout {
 
     public void setWorkoutDate(LocalDateTime workoutDate) {
         this.workoutDate = workoutDate;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public User getUser() {

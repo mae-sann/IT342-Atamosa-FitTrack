@@ -5,14 +5,9 @@ import java.util.List;
 
 public record WorkoutDetailResponseDTO(
         Long id,
+        String title,
         LocalDateTime workoutDate,
         LocalDateTime createdAt,
-        List<WorkoutLogItemDTO> logs
+        List<WorkoutLogDTO> logs
 ) {
-    public record WorkoutLogItemDTO(
-            String exerciseName,
-            Integer sets,
-            Integer reps
-    ) {
-    }
 }

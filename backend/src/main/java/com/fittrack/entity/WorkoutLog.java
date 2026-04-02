@@ -28,6 +28,9 @@ public class WorkoutLog {
     @Column(name = "exercise_name", nullable = false, length = 150)
     private String exerciseName;
 
+    @Column(name = "muscle_group", length = 100)
+    private String muscleGroup;
+
     @Column(nullable = false)
     private Integer sets;
 
@@ -71,6 +74,14 @@ public class WorkoutLog {
 
     public void setExerciseName(String exerciseName) {
         this.exerciseName = exerciseName;
+    }
+
+    public String getMuscleGroup() {
+        return muscleGroup;
+    }
+
+    public void setMuscleGroup(String muscleGroup) {
+        this.muscleGroup = muscleGroup;
     }
 
     public Integer getSets() {
