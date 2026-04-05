@@ -54,25 +54,60 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authenticationProvider(authenticationProvider())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService()))
-                        .successHandler(oAuth2LoginSuccessHandler)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    http
+        .csrf(csrf -> csrf.disable())
+        .cors(Customizer.withDefaults())
 
-        return http.build();
-    }
+        // ── STATELESS — no sessions, no Google redirect for API calls ──
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+
+        .authenticationProvider(authenticationProvider())
+
+        .authorizeHttpRequests(auth -> auth
+            // ── Public endpoints — no JWT needed ──
+            .requestMatchers(
+                "/api/v1/auth/**",      // login, register
+                "/api/auth/**",         // keep old pattern too just in case
+                "/api/v1/exercises",    // exercise list is public
+                "/oauth2/**",
+                "/login/oauth2/**",
+                "/error"
+            ).permitAll()
+            // ── Everything else requires JWT ──
+            .anyRequest().authenticated()
+        )
+
+        // ── Return 401 JSON instead of redirecting to Google ──
+        // This is the key fix for Android — REST APIs should never redirect
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint((request, response, authException) -> {
+                response.setStatus(401);
+                response.setContentType("application/json");
+                response.getWriter().write(
+                    "{\"success\":false,\"error\":{" +
+                    "\"code\":\"AUTH-001\"," +
+                    "\"message\":\"Authentication required\"}}"
+                );
+            })
+        )
+
+        // ── Google OAuth still works for browser-based login ──
+        .oauth2Login(oauth -> oauth
+            .userInfoEndpoint(userInfo -> userInfo
+                .userService(oAuth2UserService())
+            )
+            .successHandler(oAuth2LoginSuccessHandler)
+        )
+
+        .addFilterBefore(
+            jwtAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class
+        );
+
+    return http.build();
+}
 
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
