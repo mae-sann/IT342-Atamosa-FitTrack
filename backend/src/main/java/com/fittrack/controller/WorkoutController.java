@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fittrack.dto.WorkoutSaveRequestDTO;
+import com.fittrack.service.WorkoutFacadeService;
 import com.fittrack.service.WorkoutService;
 
 import jakarta.validation.Valid;
@@ -22,9 +23,12 @@ import jakarta.validation.Valid;
 public class WorkoutController {
 
     private final WorkoutService workoutService;
+    private final WorkoutFacadeService workoutFacadeService;  // ← ADD THIS
 
-    public WorkoutController(WorkoutService workoutService) {
+    // Update constructor to include both services
+    public WorkoutController(WorkoutService workoutService, WorkoutFacadeService workoutFacadeService) {
         this.workoutService = workoutService;
+        this.workoutFacadeService = workoutFacadeService;  // ← ADD THIS
     }
 
     @GetMapping
@@ -51,7 +55,11 @@ public class WorkoutController {
             Authentication authentication,
             @Valid @RequestBody WorkoutSaveRequestDTO request
     ) {
-        var savedWorkout = workoutService.saveWorkout(authentication.getName(), request);
+        // ✅ NOW USING FACADE PATTERN
+        var savedWorkout = workoutFacadeService.saveWorkoutWithDetails(
+            authentication.getName(), 
+            request
+        );
 
         return ResponseEntity.ok(Map.of(
                 "message", "Workout saved successfully",
