@@ -15,6 +15,9 @@ public record GoalCreateRequestDTO(
         @Size(max = 255, message = "goal_text must be at most 255 characters")
         String goalText,
 
+        @JsonProperty("goal_type")
+        String goalType,
+
         @JsonProperty("target_value")
         @NotNull(message = "target_value is required")
         @DecimalMin(value = "0.01", message = "target_value must be greater than 0")

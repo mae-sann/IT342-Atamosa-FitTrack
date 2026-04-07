@@ -31,6 +31,12 @@ public class Goal {
     @Column(name = "current_value", precision = 10, scale = 2)
     private BigDecimal currentValue;
 
+    @Column(name = "goal_type", nullable = false, length = 50)
+    private String goalType = "default";
+
+    @Column(nullable = false)
+    private boolean achieved = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -42,6 +48,9 @@ public class Goal {
     public void prePersist() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (goalType == null || goalType.isBlank()) {
+            goalType = "default";
         }
     }
 
@@ -75,6 +84,22 @@ public class Goal {
 
     public void setCurrentValue(BigDecimal currentValue) {
         this.currentValue = currentValue;
+    }
+
+    public String getGoalType() {
+        return goalType;
+    }
+
+    public void setGoalType(String goalType) {
+        this.goalType = goalType == null || goalType.isBlank() ? "default" : goalType;
+    }
+
+    public boolean isAchieved() {
+        return achieved;
+    }
+
+    public void setAchieved(boolean achieved) {
+        this.achieved = achieved;
     }
 
     public User getUser() {

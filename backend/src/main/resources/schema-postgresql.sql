@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS goals (
     goal_text VARCHAR(255),
     target_value NUMERIC(10,2),
     current_value NUMERIC(10,2),
+    goal_type VARCHAR(50) NOT NULL DEFAULT 'default',
+    achieved BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_goals_user
         FOREIGN KEY (user_id)
@@ -96,6 +98,8 @@ ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS logged_at TIMESTAMP;
 ALTER TABLE workout_logs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
 
 ALTER TABLE goals ADD COLUMN IF NOT EXISTS title VARCHAR(150);
+ALTER TABLE goals ADD COLUMN IF NOT EXISTS goal_type VARCHAR(50);
+ALTER TABLE goals ADD COLUMN IF NOT EXISTS achieved BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
 
 -- Keep legacy columns nullable so SDD inserts do not violate constraints.

@@ -30,20 +30,17 @@ public class WorkoutService {
     private final WorkoutLogRepository workoutLogRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
-    private final EmailService emailService;
 
     public WorkoutService(
             WorkoutRepository workoutRepository,
             WorkoutLogRepository workoutLogRepository,
             UserRepository userRepository,
-            ExerciseRepository exerciseRepository,
-            EmailService emailService
+            ExerciseRepository exerciseRepository
     ) {
         this.workoutRepository = workoutRepository;
         this.workoutLogRepository = workoutLogRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
-        this.emailService = emailService;
     }
 
     @Transactional(readOnly = true)
@@ -92,8 +89,6 @@ public class WorkoutService {
             savedWorkout.setLogs(savedLogs);
         }
 
-        sendWorkoutNotificationSafely(user.getEmail(), user.getFirstName());
-
         return toSummaryResponse(savedWorkout, loadExerciseGroups());
     }
 
@@ -110,13 +105,6 @@ public class WorkoutService {
         workoutLog.setReps(logRequest.reps());
         workoutLog.setWorkoutDate(workout.getWorkoutDate());
         return workoutLog;
-    }
-
-    private void sendWorkoutNotificationSafely(String email, String firstName) {
-        try {
-            emailService.sendWorkoutSavedEmail(email, firstName);
-        } catch (Exception ignored) {
-        }
     }
 
     private WorkoutResponseDTO toSummaryResponse(Workout workout, Map<String, String> exerciseGroups) {
