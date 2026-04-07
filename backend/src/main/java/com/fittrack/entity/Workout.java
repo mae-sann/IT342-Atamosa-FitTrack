@@ -17,8 +17,16 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+// ADD THESE LOMBOK IMPORTS
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 @Entity
 @Table(name = "workouts")
+@Builder  // ← BUILDER PATTERN
+@NoArgsConstructor  // ← Required for JPA
+@AllArgsConstructor // ← Required for Builder
 public class Workout {
 
     @Id
@@ -37,6 +45,7 @@ public class Workout {
 
     @OneToMany(mappedBy = "workout")
     @OrderBy("workoutDate DESC, id DESC")
+    @Builder.Default
     private List<WorkoutLog> logs = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
@@ -51,6 +60,7 @@ public class Workout {
         createdAt = now;
     }
 
+    // Getters and setters (keep your existing ones)
     public Long getId() {
         return id;
     }
@@ -98,5 +108,4 @@ public class Workout {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
 }
