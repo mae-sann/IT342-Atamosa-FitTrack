@@ -10,6 +10,7 @@ import GoalsPage from './pages/GoalsPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import OAuth2Callback from './pages/OAuth2Callback';
+import { WorkoutProvider } from './context/WorkoutContext';
 import './App.css';
 
 // Protected Route Component
@@ -37,70 +38,72 @@ function AdminRoute({ children }) {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/oauth2/callback" element={<OAuth2Callback />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/exercises"
-          element={
-            <ProtectedRoute>
-              <Exercises />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminDashboardPage />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/create-workout"
-          element={
-            <ProtectedRoute>
-              <CreateWorkout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/workout-history"
-          element={
-            <ProtectedRoute>
-              <WorkoutHistory />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/goals"
-          element={
-            <ProtectedRoute>
-              <GoalsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <WorkoutProvider>
+      <Router>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/oauth2/callback" element={<OAuth2Callback />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/exercises"
+            element={
+              <ProtectedRoute>
+                <Exercises />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboardPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/create-workout"
+            element={
+              <ProtectedRoute>
+                <CreateWorkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workout-history"
+            element={
+              <ProtectedRoute>
+                <WorkoutHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/goals"
+            element={
+              <ProtectedRoute>
+                <GoalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/login" />} />
+        </Routes>
+      </Router>
+    </WorkoutProvider>
   );
 }
 

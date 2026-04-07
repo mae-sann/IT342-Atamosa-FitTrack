@@ -1,18 +1,31 @@
 package com.fittrack.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fittrack.dto.WorkoutSaveRequestDTO;
+import com.fittrack.dto.WorkoutResponseDTO;
+import com.fittrack.entity.User;
+import com.fittrack.event.WorkoutSavedEvent;
+import com.fittrack.repository.UserRepository;
 
 @Service
 @Transactional
 public class WorkoutFacadeService {
 
     private final WorkoutService workoutService;
+    private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public WorkoutFacadeService(WorkoutService workoutService) {
+    public WorkoutFacadeService(
+            WorkoutService workoutService,
+            UserRepository userRepository,
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.workoutService = workoutService;
+        this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -40,11 +53,20 @@ public class WorkoutFacadeService {
         System.out.println("═══════════════════════════════════════");
         
         // Step 1: Save the workout using existing service
-        Object savedWorkout = workoutService.saveWorkout(userEmail, request);
+        WorkoutResponseDTO savedWorkout = workoutService.saveWorkout(userEmail, request);
         System.out.println("✅ [FACADE] Step 1 complete: Workout saved via WorkoutService");
-        
-        // Step 2: FUTURE - Send notification to user
-        // notificationService.sendWorkoutSavedNotification(userEmail, savedWorkout);
+
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+        String firstName = user != null ? user.getFirstName() : "Athlete";
+
+        eventPublisher.publishEvent(new WorkoutSavedEvent(
+            savedWorkout.id(),
+            userEmail,
+            firstName,
+            savedWorkout.workoutDate(),
+            savedWorkout.totalExercises() != null ? savedWorkout.totalExercises() : 0
+        ));
+        System.out.println("✅ [FACADE] Step 2 complete: WorkoutSavedEvent published");
         
         // Step 3: FUTURE - Update goal progress
         // goalProgressService.checkAndUpdateGoals(userEmail);

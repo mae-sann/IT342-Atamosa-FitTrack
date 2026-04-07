@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import WorkoutCard from '../components/WorkoutCard';
+import { useWorkouts } from '../context/WorkoutContext';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
-  const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { workouts, isLoading } = useWorkouts();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,13 +21,6 @@ export default function Dashboard() {
       setLoading(true);
       const userResponse = await authService.getCurrentUser();
       setUser(userResponse.data);
-
-      try {
-        const workoutsResponse = await authService.getWorkouts();
-        setWorkouts(workoutsResponse.data.items || []);
-      } catch (err) {
-        console.log('Could not fetch workouts');
-      }
     } catch (err) {
       setError('Failed to load user data');
       // Redirect to login if unauthorized
@@ -46,6 +41,10 @@ export default function Dashboard() {
 
   if (loading) {
     return <div className="dashboard-container"><div className="loading">Loading...</div></div>;
+  }
+
+  if (isLoading) {
+    return <p>Loading...</p>;
   }
 
   if (!user) {
@@ -93,12 +92,12 @@ export default function Dashboard() {
 
         <nav className="flex-1 p-4 space-y-1">
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2">Main</p>
-          <a href="#" className="nav-item active">
+          <Link to="/dashboard" className="nav-item active">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
             Dashboard
-          </a>
+          </Link>
           <Link to="/exercises" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -119,12 +118,12 @@ export default function Dashboard() {
             </svg>
             Create Workout
           </Link>
-          <a href="#" className="nav-item">
+          <Link to="/workout-history" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Workout History
-          </a>
+          </Link>
           <a href="/goals" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -247,25 +246,12 @@ export default function Dashboard() {
             <div className="glass rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold text-white text-lg">Recent Workouts</h2>
-                <a href="#" className="text-xs text-blue-400 hover:text-blue-300 transition">View all</a>
+                <Link to="/workout-history" className="text-xs text-blue-400 hover:text-blue-300 transition">View all</Link>
               </div>
               <div className="space-y-3">
                 {workouts.length > 0 ? (
-                  workouts.slice(0, 3).map((workout, index) => (
-                    <div key={index} className="workout-row">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-white">{workout.title || 'Workout Session'}</span>
-                        <span className="text-xs text-gray-500">{new Date(workout.workoutDate).toLocaleDateString()}</span>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {workout.totalExercises || 0} exercise{(workout.totalExercises || 0) === 1 ? '' : 's'}
-                      </div>
-                      <div className="flex gap-1 mt-2">
-                        <span className="text-xs bg-blue-600/20 text-blue-300 px-2 py-0.5 rounded-full">
-                          Workout
-                        </span>
-                      </div>
-                    </div>
+                  workouts.slice(0, 3).map((w) => (
+                    <WorkoutCard key={w.id} workout={w} />
                   ))
                 ) : (
                   <div className="workout-row">
