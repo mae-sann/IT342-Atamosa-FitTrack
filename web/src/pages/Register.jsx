@@ -73,8 +73,13 @@ export default function Register() {
     }
     try {
       setLoading(true);
-      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-      await authService.register(fullName, formData.email, formData.password, formData.role);
+      await authService.register({
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+        role: formData.role,
+      });
       navigate('/login?registered=true');
     } catch (err) {
       if (err.response?.status === 409) {

@@ -71,8 +71,12 @@ public class AuthService {
             throw new DuplicateEmailException("Email already exists");
         }
 
+        String firstName = request.firstName().trim();
+        String lastName = request.lastName().trim();
+
         User user = new User();
-        user.setName(request.name().trim());
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(resolveRole(request.role()));
