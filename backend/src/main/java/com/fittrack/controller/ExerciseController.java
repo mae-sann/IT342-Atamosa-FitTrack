@@ -19,6 +19,7 @@ import com.fittrack.service.ExerciseService;
 
 import jakarta.validation.Valid;
 
+//For Phase 3 Web Development
 @RestController
 @Validated
 @RequestMapping({ "/api/v1/exercises", "/api/exercises" })

@@ -4,6 +4,7 @@ import apiClient, { authService } from '../services/authService';
 import '../styles/dashboard.css';
 import '../styles/exercises.css';
 
+//For Phase 3 Web Development
 const CATEGORY_STYLES = {
 	upper: {
 		label: 'Upper Body',
