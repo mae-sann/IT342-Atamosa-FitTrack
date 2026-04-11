@@ -19,20 +19,22 @@ import com.fittrack.service.WorkoutService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/workouts")
+@RequestMapping({"/api/workouts", "/api/v1/workouts"})
 public class WorkoutController {
 
     private final WorkoutService workoutService;
-    private final WorkoutFacadeService workoutFacadeService;  // ← ADD THIS
+    private final WorkoutFacadeService workoutFacadeService;
 
-    // Update constructor to include both services
+    // Add this constructor with print statement
     public WorkoutController(WorkoutService workoutService, WorkoutFacadeService workoutFacadeService) {
         this.workoutService = workoutService;
-        this.workoutFacadeService = workoutFacadeService;  // ← ADD THIS
+        this.workoutFacadeService = workoutFacadeService;
+        System.out.println("✅✅✅ WORKOUT CONTROLLER LOADED! ✅✅✅");
     }
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getWorkouts(Authentication authentication) {
+        System.out.println("GET /api/workouts called by: " + authentication.getName());
         return ResponseEntity.ok(Map.of(
                 "items", workoutService.getWorkouts(authentication.getName()),
                 "message", "Workouts retrieved successfully"
@@ -55,7 +57,9 @@ public class WorkoutController {
             Authentication authentication,
             @Valid @RequestBody WorkoutSaveRequestDTO request
     ) {
-        // ✅ NOW USING FACADE PATTERN
+        System.out.println("POST /api/workouts called by: " + authentication.getName());
+        System.out.println("Workout data: " + request);
+        
         var savedWorkout = workoutFacadeService.saveWorkoutWithDetails(
             authentication.getName(), 
             request
