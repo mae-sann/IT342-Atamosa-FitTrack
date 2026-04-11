@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import { authService } from '../services/authService';
+import LogoutConfirmDialog from '../components/LogoutConfirmDialog';
 import '../styles/goals.css';
 
 function getStatusBadge(percentage) {
@@ -61,6 +62,8 @@ export default function GoalsPage() {
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [newCurrentValue, setNewCurrentValue] = useState('');
   const [savingUpdate, setSavingUpdate] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     loadCurrentUser();
@@ -185,6 +188,21 @@ export default function GoalsPage() {
     }
   }
 
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await authService.logout();
+      window.location.href = '/login';
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
+  };
+
   const updatePercentage = selectedGoal ? getGoalPercentage({
     target_value: selectedGoal.target_value,
     current_value: newCurrentValue,
@@ -199,7 +217,7 @@ export default function GoalsPage() {
 
   return (
     <div className="goals-page flex min-h-screen">
-      <aside className="sidebar flex flex-col">
+      <aside className="sidebar flex flex-col h-screen sticky top-0">
         <div className="p-6 border-b border-white/5">
           <a href="/dashboard" className="flex items-center gap-2">
             <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
@@ -223,7 +241,7 @@ export default function GoalsPage() {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2">Main</p>
           <a href="/dashboard" className="nav-item">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,13 +283,10 @@ export default function GoalsPage() {
           </a>
         </nav>
 
-        <div className="p-4 border-t border-white/5">
+        <div className="p-4 border-t border-white/5 mt-auto">
           <button
             type="button"
-            onClick={() => {
-              authService.logout();
-              window.location.href = '/login';
-            }}
+            onClick={handleLogout}
             className="nav-item text-red-400 hover:text-red-300 hover:bg-red-900/20"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -509,6 +524,13 @@ export default function GoalsPage() {
           </div>
         </div>
       )}
+
+      <LogoutConfirmDialog
+        isOpen={showLogoutConfirm}
+        onCancel={() => setShowLogoutConfirm(false)}
+        onConfirm={confirmLogout}
+        isProcessing={isLoggingOut}
+      />
     </div>
   );
 }

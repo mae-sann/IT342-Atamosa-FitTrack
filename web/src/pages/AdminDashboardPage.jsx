@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import LogoutConfirmDialog from '../components/LogoutConfirmDialog';
 import '../styles/dashboard.css';
 import '../styles/admin.css';
 
@@ -86,6 +87,8 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
@@ -248,9 +251,19 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await authService.logout();
-    navigate('/login');
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await authService.logout();
+      navigate('/login');
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
   };
 
   if (loading) {
@@ -263,7 +276,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-[#0A0F1E] text-white">
-      <aside className="sidebar flex flex-col">
+      <aside className="sidebar flex flex-col h-screen sticky top-0">
         <div className="p-6 border-b border-white/5">
           <Link to="/dashboard" className="flex items-center gap-2">
             <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
@@ -289,7 +302,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2">Admin</p>
           <Link to="/admin" className="nav-item active">
             <DashboardIcon />
@@ -307,7 +320,7 @@ export default function AdminDashboardPage() {
           </button>
         </nav>
 
-        <div className="p-4 border-t border-white/5">
+        <div className="p-4 border-t border-white/5 mt-auto">
           <button onClick={handleLogout} className="nav-item text-red-400 hover:text-red-300 hover:bg-red-900/20 w-full text-left">
             <LogoutIcon />
             Logout
@@ -568,6 +581,13 @@ export default function AdminDashboardPage() {
           )}
         </div>
       </main>
+
+      <LogoutConfirmDialog
+        isOpen={showLogoutConfirm}
+        onCancel={() => setShowLogoutConfirm(false)}
+        onConfirm={confirmLogout}
+        isProcessing={isLoggingOut}
+      />
 
       {/* Modal */}
       {modalOpen && (

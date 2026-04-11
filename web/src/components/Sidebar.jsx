@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import LogoutConfirmDialog from './LogoutConfirmDialog';
 
 function getDisplayName(user) {
   if (!user) return '';
@@ -18,15 +20,27 @@ function getInitials(fullName) {
 
 export default function Sidebar({ user, active = 'dashboard' }) {
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const fullName = getDisplayName(user);
   const isLoadingUser = !user;
   const userInitials = isLoadingUser ? '...' : getInitials(fullName);
   const isAdmin = String(user?.role || '').toUpperCase().includes('ADMIN');
 
-  const handleLogout = async () => {
-    await authService.logout();
-    localStorage.removeItem('user');
-    navigate('/login');
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await authService.logout();
+      localStorage.removeItem('user');
+      navigate('/login');
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
   };
 
   return (
@@ -110,6 +124,13 @@ export default function Sidebar({ user, active = 'dashboard' }) {
           Logout
         </button>
       </div>
+
+      <LogoutConfirmDialog
+        isOpen={showLogoutConfirm}
+        onCancel={() => setShowLogoutConfirm(false)}
+        onConfirm={confirmLogout}
+        isProcessing={isLoggingOut}
+      />
     </aside>
   );
 }
