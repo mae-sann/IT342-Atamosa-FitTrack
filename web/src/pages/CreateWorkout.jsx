@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import LogoutConfirmDialog from '../components/LogoutConfirmDialog';
 import '../styles/dashboard.css';
@@ -334,7 +335,7 @@ export default function CreateWorkout() {
         </nav>
 
         <div className="p-4 border-t border-white/5 mt-auto">
-          <button onClick={handleLogout} className="nav-item text-red-400 hover:text-red-300 hover:bg-red-900/20 w-full text-left">
+          <button onClick={handleLogout} className="nav-item nav-item--logout w-full text-left">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
@@ -343,15 +344,15 @@ export default function CreateWorkout() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto flex flex-col items-center">
-        <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 w-full">
-          <div className="max-w-4xl mx-auto">
+      <main className="flex-1 overflow-y-auto">
+        <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 flex items-center justify-between">
+          <div>
             <h1 className="text-xl font-bold text-white">Create New Workout</h1>
             <p className="text-sm text-gray-500">Build your session by selecting exercises and entering sets & reps</p>
           </div>
         </div>
 
-        <div className="w-full max-w-4xl p-8">
+        <div className="w-full max-w-4xl p-8 mx-auto">
           {error && (
             <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
               {error}
@@ -479,7 +480,7 @@ export default function CreateWorkout() {
 
             <button
               onClick={handleAddExercise}
-              className="w-full rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 transition"
+              className="cw-btn cw-btn--add"
             >
               + Add Exercise
             </button>
@@ -537,7 +538,7 @@ export default function CreateWorkout() {
 
                         <button
                           onClick={() => handleRemoveExercise(exercise.id)}
-                          className="text-white !bg-red-600/30 hover:!bg-red-600 rounded-lg px-2 py-1.5 text-sm transition flex-shrink-0 w-8 h-8 flex items-center justify-center self-center !shadow-none hover:!shadow-none !transform-none hover:!transform-none"
+                          className="cw-btn cw-btn--remove"
                         >
                           ✕
                         </button>
@@ -553,7 +554,7 @@ export default function CreateWorkout() {
           <div className="flex gap-3">
             <button
               onClick={handleCancel}
-              className="rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold px-5 py-2.5 transition"
+              className="cw-btn cw-btn--cancel"
             >
               Cancel
             </button>
@@ -561,7 +562,7 @@ export default function CreateWorkout() {
             <button
               onClick={handleSaveWorkout}
               disabled={loading}
-              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="cw-btn cw-btn--save"
             >
               {loading ? 'Saving...' : 'Save Workout'}
             </button>

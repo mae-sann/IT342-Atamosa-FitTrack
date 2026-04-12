@@ -178,15 +178,15 @@ export default function ProfilePage() {
     <div className="profile-page flex min-h-screen">
       <Sidebar user={user} active="profile" />
 
-      <main className="flex-1 overflow-y-auto flex flex-col items-center">
-        <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 w-full">
-          <div className="max-w-4xl mx-auto">
+      <main className="flex-1 overflow-y-auto">
+        <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 flex items-center justify-between">
+          <div>
             <h1 className="text-xl font-bold text-white">Profile Settings</h1>
             <p className="text-sm text-gray-500">Manage your account information and security</p>
           </div>
         </div>
 
-        <div className="w-full max-w-4xl p-8">
+        <div className="w-full max-w-4xl p-8 mx-auto">
           {(loading && !user) && (
             <div className="glass rounded-2xl p-4 mb-6 text-sm text-gray-300">Loading profile...</div>
           )}

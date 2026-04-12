@@ -99,7 +99,7 @@ export default function Exercises() {
 						: [];
 
 			setExercises(exerciseItems);
-		} catch (requestError) {
+		} catch {
 			setError('Failed to load exercise library. Please try again.');
 		} finally {
 			setLoading(false);
@@ -257,7 +257,7 @@ export default function Exercises() {
 				</nav>
 
 				<div className="p-4 border-t border-white/5 mt-auto">
-					<button onClick={handleLogout} className="nav-item text-red-400 hover:text-red-300 hover:bg-red-900/20 w-full text-left">
+					<button onClick={handleLogout} className="nav-item nav-item--logout w-full text-left">
 						<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
 						</svg>

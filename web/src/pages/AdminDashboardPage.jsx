@@ -321,7 +321,7 @@ export default function AdminDashboardPage() {
         </nav>
 
         <div className="p-4 border-t border-white/5 mt-auto">
-          <button onClick={handleLogout} className="nav-item text-red-400 hover:text-red-300 hover:bg-red-900/20 w-full text-left">
+          <button onClick={handleLogout} className="nav-item nav-item--logout w-full text-left">
             <LogoutIcon />
             Logout
           </button>
