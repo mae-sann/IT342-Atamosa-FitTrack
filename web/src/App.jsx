@@ -8,7 +8,7 @@ import CreateWorkout from './pages/user/CreateWorkout';
 import WorkoutHistory from './pages/user/WorkoutHistory';
 import GoalsPage from './pages/user/GoalsPage';
 import ProfilePage from './pages/user/ProfilePage';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import OAuth2Callback from './pages/OAuth2Callback';
 import { WorkoutProvider } from './context/WorkoutContext';
 import UserLayout from './layouts/UserLayout';
@@ -69,7 +69,7 @@ function App() {
               </AdminRoute>
             }
           >
-            <Route index element={<AdminDashboardPage />} />
+            <Route index element={<AdminDashboard />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/login" />} />
