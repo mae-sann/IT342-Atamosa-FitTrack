@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { authService } from '../services/authService';
-import Sidebar from '../components/Sidebar';
-import '../styles/dashboard.css';
-import '../styles/profile.css';
+import { authService } from '../../services/authService';
+import '../../styles/dashboard.css';
+import '../../styles/profile.css';
 
 function formatMemberSince(dateValue) {
   if (!dateValue) return 'Unknown';
@@ -175,8 +174,7 @@ export default function ProfilePage() {
   const isGoogleAccount = String(user?.provider || '').toUpperCase() === 'GOOGLE';
 
   return (
-    <div className="profile-page flex min-h-screen">
-      <Sidebar user={user} active="profile" />
+    <div className="profile-page">
 
       <main className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 flex items-center justify-between">

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import { authService } from '../services/authService';
-import Sidebar from '../components/Sidebar';
-import '../styles/dashboard.css';
+import api from '../../services/api';
+import { authService } from '../../services/authService';
+import '../../styles/dashboard.css';
 
 const WEEKLY_WORKOUT_GOAL = 4;
 const WEEK_DAYS_MON_TO_SUN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -314,8 +313,6 @@ export default function Dashboard() {
 
   return (
     <div className="db-root">
-
-      <Sidebar user={user} active="dashboard" />
 
       {/* ── Main ─────────────────────────────────────────────── */}
       <main className="db-main">

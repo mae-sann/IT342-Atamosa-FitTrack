@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import api from '../services/api';
-import { authService } from '../services/authService';
-import Sidebar from '../components/Sidebar';
-import '../styles/goals.css';
+import api from '../../services/api';
+import { authService } from '../../services/authService';
+import '../../styles/goals.css';
 
 function getStatusBadge(percentage) {
   if (percentage >= 100) {
@@ -184,8 +183,7 @@ export default function GoalsPage() {
   const updateStatus = getStatusBadge(updatePercentage);
 
   return (
-    <div className="goals-page flex min-h-screen">
-      <Sidebar user={user} active="goals" />
+    <div className="goals-page">
 
       <main className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 flex items-center justify-between">

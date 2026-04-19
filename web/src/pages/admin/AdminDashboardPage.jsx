@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
-import LogoutConfirmDialog from '../components/LogoutConfirmDialog';
-import '../styles/dashboard.css';
-import '../styles/admin.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
+import '../../styles/dashboard.css';
+import '../../styles/admin.css';
 
 // Icon components
 const UserIcon = () => (
@@ -30,21 +29,9 @@ const ActiveIcon = () => (
   </svg>
 );
 
-const DashboardIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-  </svg>
-);
-
 const SearchIcon = () => (
   <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-  </svg>
-);
-
-const LogoutIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
   </svg>
 );
 
@@ -83,12 +70,11 @@ const getCategoryBadgeClass = (category = '') => {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('users');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
@@ -136,6 +122,16 @@ export default function AdminDashboardPage() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab === 'exercises') {
+      setActiveTab('exercises');
+      return;
+    }
+    setActiveTab('users');
+  }, [location.search]);
+
   const filteredUsers = useMemo(() => {
     const query = userSearch.trim().toLowerCase();
     if (!query) return users;
@@ -160,16 +156,6 @@ export default function AdminDashboardPage() {
       (exercise.muscle_group || '').toLowerCase().includes(query)
     );
   }, [exerciseSearch, exercises]);
-
-  const userInitials = useMemo(() => {
-    const fullName = `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim();
-    if (!fullName) return 'AD';
-    return fullName
-      .split(' ')
-      .slice(0, 2)
-      .map((part) => part.charAt(0).toUpperCase())
-      .join('');
-  }, [currentUser]);
 
   const openCreateModal = () => {
     setEditingExerciseId(null);
@@ -251,19 +237,9 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    setShowLogoutConfirm(true);
-  };
-
-  const confirmLogout = async () => {
-    try {
-      setIsLoggingOut(true);
-      await authService.logout();
-      navigate('/login');
-    } finally {
-      setIsLoggingOut(false);
-      setShowLogoutConfirm(false);
-    }
+  const selectTab = (tab) => {
+    setActiveTab(tab);
+    navigate(tab === 'users' ? '/admin?tab=users' : '/admin?tab=exercises', { replace: true });
   };
 
   if (loading) {
@@ -275,59 +251,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0A0F1E] text-white">
-      <aside className="sidebar flex flex-col h-screen sticky top-0">
-        <div className="p-6 border-b border-white/5">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span className="bebas text-2xl tracking-wider text-white">FitTrack</span>
-          </Link>
-          <div className="mt-2 inline-flex items-center gap-1.5 bg-red-600/20 text-red-300 text-xs font-bold px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span>
-            Admin Panel
-          </div>
-        </div>
-
-        <div className="px-4 py-4 border-b border-white/5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center font-bold text-sm">{userInitials}</div>
-            <div>
-              <div className="text-sm font-semibold">{`${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Admin User'}</div>
-              <div className="text-xs text-gray-500">{currentUser?.email || 'admin@fittrack.com'}</div>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2">Admin</p>
-          <Link to="/admin" className="nav-item active">
-            <DashboardIcon />
-            Dashboard
-          </Link>
-          <button onClick={() => setActiveTab('users')} className={`nav-item ${activeTab === 'users' ? 'active' : ''}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            User Management
-          </button>
-          <button onClick={() => setActiveTab('exercises')} className={`nav-item ${activeTab === 'exercises' ? 'active' : ''}`}>
-            <ExerciseIcon />
-            Exercise Management
-          </button>
-        </nav>
-
-        <div className="p-4 border-t border-white/5 mt-auto">
-          <button onClick={handleLogout} className="nav-item nav-item--logout w-full text-left">
-            <LogoutIcon />
-            Logout
-          </button>
-        </div>
-      </aside>
-
+    <>
       <main className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-20 bg-[#0A0F1E]/80 backdrop-blur border-b border-white/5 px-8 py-4 flex items-center justify-between">
           <div>
@@ -385,10 +309,10 @@ export default function AdminDashboardPage() {
 
           {/* Tab Navigation */}
           <div className="flex gap-2 mb-6 bg-white/5 p-1.5 rounded-xl w-fit border border-white/10">
-            <button onClick={() => setActiveTab('users')} className={`admin-tab-btn ${activeTab === 'users' ? 'active' : ''}`}>
+            <button onClick={() => selectTab('users')} className={`admin-tab-btn ${activeTab === 'users' ? 'active' : ''}`}>
               👤 User Management
             </button>
-            <button onClick={() => setActiveTab('exercises')} className={`admin-tab-btn ${activeTab === 'exercises' ? 'active' : ''}`}>
+            <button onClick={() => selectTab('exercises')} className={`admin-tab-btn ${activeTab === 'exercises' ? 'active' : ''}`}>
               🏋️ Exercise Management
             </button>
           </div>
@@ -582,13 +506,6 @@ export default function AdminDashboardPage() {
         </div>
       </main>
 
-      <LogoutConfirmDialog
-        isOpen={showLogoutConfirm}
-        onCancel={() => setShowLogoutConfirm(false)}
-        onConfirm={confirmLogout}
-        isProcessing={isLoggingOut}
-      />
-
       {/* Modal */}
       {modalOpen && (
         <div className="admin-modal-bg" onClick={closeModal}>
@@ -645,6 +562,6 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
