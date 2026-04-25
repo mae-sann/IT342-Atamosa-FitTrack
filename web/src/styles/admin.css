@@ -176,16 +176,46 @@
 
 /* Action Buttons */
 .admin-action-btn {
-  padding: 5px 11px;
-  border-radius: 7px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
   border: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  transform: none;
+  box-shadow: none;
+}
+
+.admin-action-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.admin-action-btn--edit {
+  background: rgba(37, 99, 235, 0.2);
+  color: #93c5fd;
+}
+
+.admin-action-btn--edit:hover {
+  background: rgba(37, 99, 235, 0.3);
+  color: #bfdbfe;
+}
+
+.admin-action-btn--delete {
+  background: rgba(220, 38, 38, 0.2);
+  color: #fca5a5;
+}
+
+.admin-action-btn--delete:hover {
+  background: rgba(220, 38, 38, 0.3);
+  color: #fecaca;
+}
+
+.admin-action-btn--disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: #6b7280;
 }
 
 .admin-action-btn:disabled {

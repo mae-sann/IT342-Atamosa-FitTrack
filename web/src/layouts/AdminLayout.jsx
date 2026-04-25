@@ -20,7 +20,7 @@ function getActiveAdminKey(search) {
   if (tab === 'users') return 'users';
   if (tab === 'exercises') return 'exercises';
   return 'admin-dashboard';
-}
+}   
 
 export default function AdminLayout() {
   const navigate = useNavigate();
