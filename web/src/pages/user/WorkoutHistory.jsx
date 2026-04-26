@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { authService } from '../../services/authService';
+import ConfirmWorkoutDeleteModal from '../../components/ConfirmWorkoutDeleteModal';
 import '../../styles/dashboard.css';
 
 function getCategoryStyle(muscleGroup) {
@@ -124,6 +125,7 @@ export default function WorkoutHistory() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedWorkoutId, setSelectedWorkoutId] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [deleteWorkoutTarget, setDeleteWorkoutTarget] = useState(null);
 
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -309,9 +311,6 @@ export default function WorkoutHistory() {
   };
 
   const handleDeleteWorkout = async (workoutId) => {
-    const confirmed = window.confirm('Delete this workout? This action cannot be undone.');
-    if (!confirmed) return;
-
     try {
       await api.delete(`/api/workouts/${workoutId}`);
       setWorkouts((prev) => prev.filter((workout) => workout.id !== workoutId));
@@ -320,10 +319,20 @@ export default function WorkoutHistory() {
         delete next[workoutId];
         return next;
       });
+      setDeleteWorkoutTarget(null);
       showToast('Workout deleted successfully.', 'success');
     } catch {
       showToast('Failed to delete workout.', 'error');
     }
+  };
+
+  const openDeleteWorkoutModal = (workout) => {
+    setDeleteWorkoutTarget(workout);
+  };
+
+  const confirmDeleteWorkout = () => {
+    if (!deleteWorkoutTarget) return;
+    handleDeleteWorkout(deleteWorkoutTarget.id);
   };
 
   if (loading) {
@@ -471,7 +480,7 @@ export default function WorkoutHistory() {
                                 Edit
                               </button>
                               <button
-                                onClick={() => handleDeleteWorkout(workout.id)}
+                                onClick={() => openDeleteWorkoutModal(workout)}
                                 className="wh-action-btn wh-action-btn--delete"
                               >
                                 Delete
@@ -589,6 +598,13 @@ export default function WorkoutHistory() {
     </div>
   </div>
 )}
+
+  <ConfirmWorkoutDeleteModal
+    isOpen={Boolean(deleteWorkoutTarget)}
+    workout={deleteWorkoutTarget}
+    onClose={() => setDeleteWorkoutTarget(null)}
+    onConfirm={confirmDeleteWorkout}
+  />
 
       {/* Toast Notification */}
       <div

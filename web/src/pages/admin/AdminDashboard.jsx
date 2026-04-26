@@ -199,9 +199,6 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteExercise = async (exercise) => {
-    const confirmed = window.confirm(`Delete exercise "${exercise.name}"?`);
-    if (!confirmed) return;
-
     try {
       setError('');
       await adminService.deleteExercise(exercise.id);
@@ -214,8 +211,6 @@ export default function AdminDashboard() {
 
   const handleToggleUserRole = async (user) => {
     const nextRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
-    const confirmed = window.confirm(`Change role of ${user.email} to ${nextRole}?`);
-    if (!confirmed) return;
 
     try {
       setError('');
@@ -228,9 +223,6 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteUser = async (user) => {
-    const confirmed = window.confirm(`Delete user ${user.email}?`);
-    if (!confirmed) return;
-
     try {
       setError('');
       await adminService.deleteUser(user.id);
