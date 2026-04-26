@@ -16,7 +16,7 @@ export default function ExerciseModal({
       <div className="admin-modal w-full" style={{ maxWidth: '480px' }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-white">{isEditing ? 'Edit Exercise' : 'Add New Exercise'}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition text-2xl leading-none">×</button>
+          <button onClick={onClose} className="admin-modal-close-btn" aria-label="Close modal">×</button>
         </div>
 
         <div className="space-y-4">
@@ -61,7 +61,7 @@ export default function ExerciseModal({
           <button
             onClick={onClose}
             disabled={isSaving}
-            className="flex-1 py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:border-white/30 transition font-semibold text-sm"
+            className="admin-modal-cancel-btn flex-1"
           >
             Cancel
           </button>
