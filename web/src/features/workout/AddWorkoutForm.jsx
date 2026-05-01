@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useWorkouts } from '../context/WorkoutContext';
+import { useWorkouts } from '../../shared/context/WorkoutContext';
 
 export default function AddWorkoutForm() {
   const { addWorkout } = useWorkouts();

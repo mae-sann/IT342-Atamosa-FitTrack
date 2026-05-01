@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
-import { authService } from '../../services/authService';
-import '../../styles/dashboard.css';
+import api from '../../shared/services/api';
+import { authService } from '../../shared/services/authService';
+import '../../shared/styles/dashboard.css';
 
 const WEEKLY_WORKOUT_GOAL = 4;
 const WEEK_DAYS_MON_TO_SUN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

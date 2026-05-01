@@ -1,18 +1,18 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { isAuthenticated } from './services/authService';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import Dashboard from './pages/user/Dashboard';
-import Exercises from './pages/user/Exercises';
-import CreateWorkout from './pages/user/CreateWorkout';
-import WorkoutHistory from './pages/user/WorkoutHistory';
-import GoalsPage from './pages/user/GoalsPage';
-import ProfilePage from './pages/user/ProfilePage';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import OAuth2Callback from './pages/OAuth2Callback';
-import { WorkoutProvider } from './context/WorkoutContext';
-import UserLayout from './layouts/UserLayout';
-import AdminLayout from './layouts/AdminLayout';
+import { isAuthenticated } from './shared/services/authService';
+import Register from './features/auth/Register';
+import Login from './features/auth/Login';
+import Dashboard from './features/user/Dashboard';
+import Exercises from './features/exercise/Exercises';
+import CreateWorkout from './features/workout/CreateWorkout';
+import WorkoutHistory from './features/workout/WorkoutHistory';
+import GoalsPage from './features/goal/GoalsPage';
+import ProfilePage from './features/user/ProfilePage';
+import AdminDashboard from './features/admin/AdminDashboard';
+import OAuth2Callback from './features/auth/OAuth2Callback';
+import { WorkoutProvider } from './shared/context/WorkoutContext';
+import UserLayout from './shared/layouts/UserLayout';
+import AdminLayout from './shared/layouts/AdminLayout';
 import './App.css';
 
 // Protected Route Component

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { authService, setAuthToken, isAuthenticated } from '../services/authService';
-import '../styles/auth.css';
+import { authService, setAuthToken, isAuthenticated } from '../../shared/services/authService';
+import '../../shared/styles/auth.css';
 
 const getRouteByRole = (role) => {
   const normalized = String(role || '').toUpperCase();

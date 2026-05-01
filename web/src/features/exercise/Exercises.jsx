@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import apiClient, { authService } from '../../services/authService';
-import '../../styles/dashboard.css';
-import '../../styles/exercises.css';
+import apiClient, { authService } from '../../shared/services/authService';
+import '../../shared/styles/dashboard.css';
+import '../../shared/styles/exercises.css';
 
 //For Phase 3 Web Development
 const CATEGORY_STYLES = {

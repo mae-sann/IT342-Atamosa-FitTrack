@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { authService } from '../../services/authService';
-import adminService from '../../services/adminService';
+import { authService } from '../../shared/services/authService';
+import adminService from '../../shared/services/adminService';
 
-import StatsCards from '../../components/admin/StatsCards';
-import UserTable from '../../components/admin/UserTable';
-import ExerciseTable from '../../components/admin/ExerciseTable';
-import ExerciseModal from '../../components/admin/ExerciseModal';
+import StatsCards from '../../features/admin/components/StatsCards';
+import UserTable from '../../features/admin/components/UserTable';
+import ExerciseTable from '../../features/admin/components/ExerciseTable';
+import ExerciseModal from '../../features/admin/components/ExerciseModal';
 
-import '../../styles/dashboard.css';
-import '../../styles/admin.css';
+import '../../shared/styles/dashboard.css';
+import '../../shared/styles/admin.css';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();

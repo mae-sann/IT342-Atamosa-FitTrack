@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { authService } from '../../services/authService';
-import '../../styles/dashboard.css';
-import '../../styles/profile.css';
+import { authService } from '../../shared/services/authService';
+import '../../shared/styles/dashboard.css';
+import '../../shared/styles/profile.css';
 
 function formatMemberSince(dateValue) {
   if (!dateValue) return 'Unknown';

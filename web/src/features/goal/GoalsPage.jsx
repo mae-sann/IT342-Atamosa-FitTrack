@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import api from '../../services/api';
-import { authService } from '../../services/authService';
-import '../../styles/goals.css';
+import api from '../../shared/services/api';
+import { authService } from '../../shared/services/authService';
+import '../../shared/styles/goals.css';
 
 function getStatusBadge(percentage) {
   if (percentage >= 100) {

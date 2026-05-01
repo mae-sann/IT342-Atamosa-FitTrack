@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
-import { authService } from '../../services/authService';
-import ConfirmWorkoutDeleteModal from '../../components/ConfirmWorkoutDeleteModal';
-import '../../styles/dashboard.css';
+import api from '../../shared/services/api';
+import { authService } from '../../shared/services/authService';
+import ConfirmWorkoutDeleteModal from './ConfirmWorkoutDeleteModal';
+import '../../shared/styles/dashboard.css';
 
 function getCategoryStyle(muscleGroup) {
   const group = muscleGroup?.toLowerCase() || '';

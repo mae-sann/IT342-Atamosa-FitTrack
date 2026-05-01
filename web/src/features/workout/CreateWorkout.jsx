@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
-import '../../styles/dashboard.css';
+import api from '../../shared/services/api';
+import '../../shared/styles/dashboard.css';
 
 function getCategoryStyle(muscleGroup) {
   const group = muscleGroup?.toLowerCase() || '';
