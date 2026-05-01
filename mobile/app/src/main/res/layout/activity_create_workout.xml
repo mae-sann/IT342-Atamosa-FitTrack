@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/colorSurface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_button_secondary"
+            android:text="← Back"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="13sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:stateListAnimator="@null"
+            android:layout_marginEnd="12dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Create New Workout"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnSaveWorkout"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_button_primary"
+            android:text="💾 Save"
+            android:textColor="@color/colorWhite"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Session Details card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📅  Session Details"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- Workout Name Field - NEW -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Workout Name"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp"/>
+
+                <EditText
+                    android:id="@+id/etWorkoutName"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="e.g., Upper Body Power"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textColorHint="@color/colorTextMuted"
+                    android:textSize="14sp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Workout Date"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp"/>
+
+                <Button
+                    android:id="@+id/btnPickDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_field"
+                    android:text="Select Date"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical|start"
+                    android:paddingStart="16dp"
+                    android:stateListAnimator="@null"/>
+            </LinearLayout>
+
+            <!-- Add Exercise card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏋️  Add Exercise"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- Browse exercise button -->
+                <Button
+                    android:id="@+id/btnBrowseExercise"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:text="Browse Exercise Library →"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:stateListAnimator="@null"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Selected exercise name (read only) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Selected Exercise"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:id="@+id/tvSelectedExercise"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_field"
+                    android:text="No exercise selected"
+                    android:textColor="@color/colorTextMuted"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Sets + Reps row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sets"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="6dp"/>
+
+                        <EditText
+                            android:id="@+id/etSets"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_field"
+                            android:hint="3"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textColorHint="@color/colorTextMuted"
+                            android:textSize="14sp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:inputType="number"
+                            android:singleLine="true"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reps"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="6dp"/>
+
+                        <EditText
+                            android:id="@+id/etReps"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_field"
+                            android:hint="10"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textColorHint="@color/colorTextMuted"
+                            android:textSize="14sp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:inputType="number"
+                            android:singleLine="true"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Add exercise button -->
+                <Button
+                    android:id="@+id/btnAddExercise"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_button_primary"
+                    android:text="+ Add Exercise to Workout"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:stateListAnimator="@null"/>
+            </LinearLayout>
+
+            <!-- Exercises in workout card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Exercises in This Workout"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"/>
+
+                    <TextView
+                        android:id="@+id/tvExerciseCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_gray"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="0 exercises"
+                        android:textColor="@color/colorGeneralText"
+                        android:textSize="11sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <!-- Empty state -->
+                <LinearLayout
+                    android:id="@+id/layoutExerciseEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🏋️"
+                        android:textSize="28sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="No exercises added yet"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="13sp"/>
+                </LinearLayout>
+
+                <!-- Exercise list container -->
+                <LinearLayout
+                    android:id="@+id/layoutExerciseList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

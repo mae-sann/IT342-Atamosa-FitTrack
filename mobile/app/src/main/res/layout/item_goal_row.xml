@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical"
+    android:padding="14dp"
+    android:layout_marginBottom="8dp">
+
+    <!-- Goal text + status badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/tvGoalText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bench Press 80 kg"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/tvGoalStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_badge_blue"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="In Progress"
+            android:textColor="@color/colorUpperBodyText"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Progress bar -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@drawable/bg_progress_track"
+        android:layout_marginBottom="6dp">
+
+        <View
+            android:id="@+id/viewGoalProgress"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_progress_fill_blue"/>
+    </FrameLayout>
+
+    <!-- Current / Percentage / Target -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvGoalCurrent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="60 current"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/tvGoalPct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="75%"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvGoalTarget"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="80 target"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="12sp"
+            android:gravity="end"/>
+    </LinearLayout>
+
+</LinearLayout>

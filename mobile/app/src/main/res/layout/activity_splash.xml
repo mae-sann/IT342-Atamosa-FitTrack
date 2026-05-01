@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <!-- App Icon Circle -->
+    <FrameLayout
+        android:layout_width="80dp"
+        android:layout_height="80dp">
+
+        <View
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_avatar"
+            android:backgroundTint="@color/colorPrimary"/>
+
+        <!-- Lightning bolt icon using text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="⚡"
+            android:textSize="36sp"/>
+    </FrameLayout>
+
+    <!-- App Name -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="FITTRACK"
+        android:textColor="@color/colorTextPrimary"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.15"/>
+
+    <!-- Tagline -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Track. Grow. Dominate."
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="14sp"/>
+
+</LinearLayout>

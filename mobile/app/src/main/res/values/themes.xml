@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base app theme — dark throughout -->
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorBackground</item>
+        <item name="android:colorAccent">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:navigationBarColor">@color/colorSurface</item>
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <!-- Splash screen — pure dark, no action bar -->
+    <style name="AppTheme.Splash" parent="AppTheme">
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+
+    <!-- ── Text Styles ── -->
+    <style name="TextStyle.Heading" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextStyle.SubHeading" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextStyle.Body" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextStyle.Caption" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorTextSecondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextStyle.Muted" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorTextMuted</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- ── Button Styles ── -->
+    <style name="ButtonStyle.Primary" parent="android:Widget.Button">
+        <item name="android:background">@drawable/bg_button_primary</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="ButtonStyle.Secondary" parent="android:Widget.Button">
+        <item name="android:background">@drawable/bg_button_secondary</item>
+        <item name="android:textColor">@color/colorTextSecondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="ButtonStyle.Danger" parent="android:Widget.Button">
+        <item name="android:background">@drawable/bg_button_danger</item>
+        <item name="android:textColor">@color/colorError</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <!-- ── Input Field Style ── -->
+    <style name="InputStyle" parent="android:Widget.EditText">
+        <item name="android:background">@drawable/bg_input_field</item>
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textColorHint">@color/colorTextMuted</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+</resources>
