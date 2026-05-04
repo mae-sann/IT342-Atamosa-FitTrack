@@ -151,6 +151,16 @@
   box-shadow: none;
 }
 
+.goals-page .modal-close--danger {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+}
+
+.goals-page .modal-close--danger:hover {
+  background: rgba(239, 68, 68, 0.28);
+  color: #fecaca;
+}
+
 .goals-page .modal-close:focus-visible {
   outline: 2px solid rgba(59, 130, 246, 0.5);
   outline-offset: 2px;
@@ -215,6 +225,25 @@
 .goals-page .btn-ghost:hover {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.3);
+  transform: none;
+  box-shadow: none;
+}
+
+.goals-page .btn-danger {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.goals-page .btn-danger:hover {
+  background: rgba(239, 68, 68, 0.28);
+  color: #fecaca;
   transform: none;
   box-shadow: none;
 }

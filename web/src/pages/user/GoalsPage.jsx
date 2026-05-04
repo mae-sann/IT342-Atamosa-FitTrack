@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
+<<<<<<< Updated upstream:web/src/pages/user/GoalsPage.jsx
 import api from '../../services/api';
 import { authService } from '../../services/authService';
 import '../../styles/goals.css';
+=======
+import api from '../../shared/services/api';
+import { authService } from '../../shared/services/authService';
+import ConfirmGoalDeleteModal from './ConfirmGoalDeleteModal';
+import '../../shared/styles/goals.css';
+>>>>>>> Stashed changes:web/src/features/goal/GoalsPage.jsx
 
 function getStatusBadge(percentage) {
   if (percentage >= 100) {
@@ -60,6 +67,9 @@ export default function GoalsPage() {
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [newCurrentValue, setNewCurrentValue] = useState('');
   const [savingUpdate, setSavingUpdate] = useState(false);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedGoalToDelete, setSelectedGoalToDelete] = useState(null);
 
   useEffect(() => {
     loadCurrentUser();
@@ -165,15 +175,25 @@ export default function GoalsPage() {
   }
 
   async function deleteGoal(goal) {
-    if (!window.confirm('Delete this goal? This cannot be undone.')) return;
-
     try {
       await api.delete(`/api/v1/goals/${goal.id}`);
+      setDeleteModalOpen(false);
+      setSelectedGoalToDelete(null);
       await loadGoals();
     } catch (error) {
       console.error('Failed to delete goal:', error);
       window.alert('Failed to delete goal.');
     }
+  }
+
+  function openDelete(goal) {
+    setSelectedGoalToDelete(goal);
+    setDeleteModalOpen(true);
+  }
+
+  function closeDelete() {
+    setDeleteModalOpen(false);
+    setSelectedGoalToDelete(null);
   }
 
   const updatePercentage = selectedGoal ? getGoalPercentage({
@@ -257,7 +277,7 @@ export default function GoalsPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => deleteGoal(goal)}
+                        onClick={() => openDelete(goal)}
                         className="p-2 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 transition"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,12 +329,12 @@ export default function GoalsPage() {
                   placeholder="e.g., Bench Press 80 kg, Run 5 km..."
                   className="input-field"
                 />
-                <p className="text-xs text-gray-500 mt-1.5">Write it as a clear, specific goal</p>
+            
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Starting Value</label>
+                  <label className="block text-sm font-semibold text-gray-300 mb-2 mt-4">Starting Value</label>
                   <input
                     type="number"
                     value={currentValue}
@@ -325,7 +345,7 @@ export default function GoalsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">Target Value</label>
+                  <label className="block text-sm font-semibold text-gray-300 mb-2 mt-4">Target Value</label>
                   <input
                     type="number"
                     value={targetValue}
@@ -337,7 +357,7 @@ export default function GoalsPage() {
                 </div>
               </div>
 
-              <div className="bg-blue-600/10 border border-blue-600/20 rounded-xl p-3 text-xs text-blue-300 leading-relaxed">
+              <div className="bg-blue-600/10 border border-blue-600/20 rounded-xl p-3 text-xs text-blue-300 leading-relaxed mt-4">
                 💡 Use the same unit in your goal name and values.
                 <br />
                 Example: "Run 5 km" → Starting: 3, Target: 5
@@ -396,7 +416,7 @@ export default function GoalsPage() {
                 min="0"
                 className="input-field"
               />
-              <p className="text-xs text-gray-500 mt-1.5">
+              <p className="text-xs text-gray-500 mt-2">
                 Target: <span className="text-gray-300 font-semibold">{selectedGoal.target_value}</span>
               </p>
             </div>
@@ -412,6 +432,17 @@ export default function GoalsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmGoalDeleteModal
+        isOpen={deleteModalOpen}
+        goal={selectedGoalToDelete}
+        onClose={closeDelete}
+        onConfirm={() => {
+          if (selectedGoalToDelete) {
+            deleteGoal(selectedGoalToDelete);
+          }
+        }}
+      />
 
     </div>
   );
