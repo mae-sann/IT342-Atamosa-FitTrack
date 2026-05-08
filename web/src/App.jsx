@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { isAuthenticated } from './shared/services/authService';
 import Register from './features/auth/Register';
 import Login from './features/auth/Login';
+import Landing from './features/auth/Landing';
 import Dashboard from './features/user/Dashboard';
 import Exercises from './features/exercise/Exercises';
 import CreateWorkout from './features/workout/CreateWorkout';
@@ -72,7 +73,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
           </Route>
 
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<Landing />} />
         </Routes>
       </Router>
     </WorkoutProvider>
