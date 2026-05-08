@@ -26,6 +26,20 @@ const normalizeExercises = (payload) => {
   return [];
 };
 
+const normalizeSelectedExercises = (payload) => {
+  if (!Array.isArray(payload)) return [];
+
+  return payload
+    .filter((exercise) => exercise && (exercise.id != null || exercise.name || exercise.exerciseName))
+    .map((exercise, index) => ({
+      id: `selected-${exercise.id ?? 'exercise'}-${index}-${Date.now()}`,
+      exerciseName: exercise.name || exercise.exerciseName || 'Unnamed Exercise',
+      muscleGroup: exercise.muscle_group ?? exercise.muscleGroup ?? 'General',
+      sets: Number(exercise.sets) >= 1 ? Number(exercise.sets) : 3,
+      reps: Number(exercise.reps) >= 1 ? Number(exercise.reps) : 10,
+    }));
+};
+
 export default function CreateWorkout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,6 +76,31 @@ export default function CreateWorkout() {
     };
 
     fetchExercises();
+  }, []);
+
+  useEffect(() => {
+    let selectedExercises = [];
+
+    try {
+      selectedExercises = JSON.parse(localStorage.getItem('selected_workout_exercises') || '[]');
+    } catch {
+      selectedExercises = [];
+    }
+
+    const normalizedSelectedExercises = normalizeSelectedExercises(selectedExercises);
+    if (normalizedSelectedExercises.length === 0) return;
+
+    setExercises((prev) => {
+      const existingNames = new Set(
+        prev.map((exercise) => (exercise.exerciseName || '').trim().toLowerCase())
+      );
+
+      const newSelections = normalizedSelectedExercises.filter(
+        (exercise) => !existingNames.has((exercise.exerciseName || '').trim().toLowerCase())
+      );
+
+      return [...prev, ...newSelections];
+    });
   }, []);
 
   useEffect(() => {
@@ -201,6 +240,7 @@ export default function CreateWorkout() {
     try {
       setLoading(true);
       await api.post('/api/workouts', payload);
+      localStorage.removeItem('selected_workout_exercises');
       showToast('Workout saved successfully!');
       setTimeout(() => {
         navigate('/workout-history');
@@ -379,7 +419,8 @@ export default function CreateWorkout() {
                 {exercises.map((exercise) => {
                   const style = getCategoryStyle(exercise.muscleGroup);
                   return (
-                    <div key={exercise.id} className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+                    <div key={exercise.id} className="bg-white/5 border border-white/10 rounded-xl px-4 py-4">
+                      <div className="flex items-start gap-4">
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 self-center ${style.bg} ${style.text}`}>
                         {(exercise.exerciseName || 'E').charAt(0).toUpperCase()}
                       </div>
@@ -389,7 +430,7 @@ export default function CreateWorkout() {
                         <div className={`text-xs ${style.text}`}>{style.label}</div>
                       </div>
 
-                      <div className="flex items-start gap-3 flex-shrink-0 mt-2">
+                      <div className="flex items-start gap-3 flex-shrink-0">
                         <div className="text-center">
                           <input
                             type="number"
@@ -400,7 +441,7 @@ export default function CreateWorkout() {
                           />
                           <div className="text-xs text-gray-500 mt-1">Sets</div>
                         </div>
-                        <div className="text-gray-600 text-sm w-4 text-center">×</div>
+
                         <div className="text-center">
                           <input
                             type="number"
@@ -418,6 +459,7 @@ export default function CreateWorkout() {
                         >
                           ✕
                         </button>
+                      </div>
                       </div>
                     </div>
                   );

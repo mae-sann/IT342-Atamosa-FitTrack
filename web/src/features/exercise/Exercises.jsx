@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import apiClient, { authService } from '../../shared/services/authService';
 import '../../shared/styles/dashboard.css';
 import '../../shared/styles/exercises.css';
@@ -64,6 +64,7 @@ const getInitial = (exerciseName) => {
 };
 
 export default function Exercises() {
+	const navigate = useNavigate();
 	const [user, setUser] = useState(null);
 	const [exercises, setExercises] = useState([]);
 	const [activeCategory, setActiveCategory] = useState('All');
@@ -140,6 +141,7 @@ export default function Exercises() {
 
 		setToastMessage(`✓ "${exercise.name}" added to workout!`);
 		setToastVisible(true);
+		navigate('/create-workout');
 	};
 
 	if (loading) {
