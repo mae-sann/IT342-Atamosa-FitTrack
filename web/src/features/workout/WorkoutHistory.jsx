@@ -203,6 +203,7 @@ export default function WorkoutHistory() {
   }, [workouts, dateFilter, searchQuery, detailCache]);
 
   const totalPages = Math.max(1, Math.ceil(filteredWorkouts.length / PAGE_SIZE));
+  const showPaginationControls = filteredWorkouts.length > PAGE_SIZE;
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -500,35 +501,38 @@ export default function WorkoutHistory() {
               <span className="text-sm text-gray-400">
                 Showing {pagedWorkouts.length} of {filteredWorkouts.length} workouts
               </span>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded-lg text-sm bg-white/5 text-gray-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/10 transition"
-                >
-                  ←
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              {showPaginationControls && (
+                <div className="flex gap-1">
                   <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-1.5 rounded-lg text-sm transition ${
-                      currentPage === pageNum
-                        ? 'bg-blue-600 text-white font-bold'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                    }`}
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg text-sm bg-[#111827] border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    {pageNum}
+                    ←
                   </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 rounded-lg text-sm bg-white/5 text-gray-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/10 transition"
-                >
-                  →
-                </button>
-              </div>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      style={
+                        currentPage === pageNum
+                          ? { backgroundColor: '#2563EB', color: '#fff' }
+                          : { backgroundColor: '#64748B', color: '#e2e8f0' }
+                      }
+                      className="px-4 py-2 rounded-lg text-sm font-semibold transition hover:opacity-80"
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded-lg text-sm bg-[#111827] border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    →
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
