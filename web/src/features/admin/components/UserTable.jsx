@@ -38,6 +38,7 @@ export default function UserTable({
   currentUserId,
 }) {
   const currentPage = page + 1;
+  const showPaginationControls = totalElements > 10;
   const [roleModalUser, setRoleModalUser] = useState(null);
   const [deleteModalUser, setDeleteModalUser] = useState(null);
 
@@ -134,35 +135,40 @@ export default function UserTable({
 
         <div className="flex items-center justify-between px-5 py-4 border-t border-white/5">
           <span className="text-sm text-gray-400">Showing {users.length} of {totalElements} users</span>
-          <div className="flex gap-1">
-            <button
-              onClick={() => onPageChange(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className="px-3 py-1.5 rounded-lg text-sm bg-white/5 text-gray-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              ←
-            </button>
-
-            {pageNumbers(currentPage, totalPages).map((pageNumber) => (
+          {showPaginationControls && (
+            <div className="flex gap-1">
               <button
-                key={pageNumber}
-                onClick={() => onPageChange(pageNumber - 1)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
-                  currentPage === pageNumber ? 'bg-blue-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                }`}
+                onClick={() => onPageChange(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className="px-3 py-1.5 rounded-lg text-sm bg-[#111827] border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {pageNumber}
+                ←
               </button>
-            ))}
 
-            <button
-              onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
-              disabled={page >= totalPages - 1 || totalPages === 0}
-              className="px-3 py-1.5 rounded-lg text-sm bg-white/5 text-gray-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              →
-            </button>
-          </div>
+              {pageNumbers(currentPage, totalPages).map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => onPageChange(pageNumber - 1)}
+                  style={
+                    currentPage === pageNumber
+                      ? { backgroundColor: '#2563EB', color: '#fff' }
+                      : { backgroundColor: '#64748B', color: '#e2e8f0' }
+                  }
+                  className="px-3 py-1.5 rounded-lg text-sm font-semibold transition hover:opacity-80"
+                >
+                  {pageNumber}
+                </button>
+              ))}
+
+              <button
+                onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
+                disabled={page >= totalPages - 1 || totalPages === 0}
+                className="px-3 py-1.5 rounded-lg text-sm bg-[#111827] border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                →
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
