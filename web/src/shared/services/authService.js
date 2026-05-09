@@ -31,6 +31,7 @@ export const authService = {
   logout: () => {
     localStorage.removeItem('jwt_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('selected_workout_exercises');
     return Promise.resolve();
   },
 

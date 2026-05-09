@@ -205,10 +205,13 @@ export default function CreateWorkout() {
   };
 
   const handleRemoveExercise = (id) => {
-    setExercises((prev) => prev.filter((exercise) => exercise.id !== id));
+    const updated = exercises.filter((exercise) => exercise.id !== id);
+    setExercises(updated);
+    localStorage.setItem('selected_workout_exercises', JSON.stringify(updated));
   };
 
   const handleCancel = () => {
+    localStorage.removeItem('selected_workout_exercises');
     navigate('/dashboard');
   };
 
