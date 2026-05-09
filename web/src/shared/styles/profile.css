@@ -96,3 +96,38 @@
   box-shadow: none;
   transform: none;
 }
+
+#delete-modal-cancel {
+  background: transparent !important;
+  border: 1px solid #4B5563 !important;
+  color: white !important;
+}
+
+#delete-modal-confirm {
+  background: rgba(127, 29, 29, 0.5) !important;
+  border: 1px solid #991B1B !important;
+  color: #F87171 !important;
+}
+
+#delete-modal-close {
+  width: 32px !important;
+  height: 32px !important;
+  background: #7F1D1D !important;
+  border-radius: 8px !important;
+  border: none !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#delete-account-trigger {
+  background: rgba(127, 29, 29, 0.45) !important;
+  border: 1px solid #991B1B !important;
+  color: #FCA5A5 !important;
+}
+
+#delete-account-trigger:hover {
+  background: rgba(127, 29, 29, 0.75) !important;
+  color: #FECACA !important;
+}

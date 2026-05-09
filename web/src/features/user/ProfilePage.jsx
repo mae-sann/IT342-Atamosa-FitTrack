@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../../shared/services/authService';
 import '../../shared/styles/dashboard.css';
 import '../../shared/styles/profile.css';
@@ -20,6 +21,7 @@ function accountType(provider) {
 }
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('user') || 'null');
@@ -38,6 +40,8 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordSaving, setPasswordSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   useEffect(() => {
     loadCurrentUser();
@@ -144,6 +148,31 @@ export default function ProfilePage() {
       setError(requestError?.response?.data?.message || 'Failed to change password.');
     } finally {
       setPasswordSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const userId = user?.id;
+
+    if (!userId) {
+      setError('Unable to delete account. User ID was not found.');
+      setShowDeleteConfirm(false);
+      return;
+    }
+
+    try {
+      setDeletingAccount(true);
+      setError('');
+      await authService.deleteUser(userId);
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('user');
+      navigate('/login');
+    } catch (requestError) {
+      console.error('Failed to delete account:', requestError);
+      setError(requestError?.response?.data?.message || 'Failed to delete account.');
+    } finally {
+      setDeletingAccount(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -353,11 +382,76 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-400 mb-4">
               Permanently delete your account and all associated data. This action cannot be undone.
             </p>
-            <button type="button" className="btn-danger-disabled" disabled title="Not available in this version">
+            <button
+              id="delete-account-trigger"
+              type="button"
+              className="rounded-xl border border-red-500/40 bg-red-500/10 px-5 py-2.5 text-sm font-semibold text-red-300 transition hover:bg-red-500/20 hover:text-red-200"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={deletingAccount}
+            >
               Delete Account
             </button>
           </div>
         </div>
+
+        {showDeleteConfirm && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+            onClick={() => {
+              if (!deletingAccount) setShowDeleteConfirm(false);
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-account-title"
+            aria-describedby="delete-account-message"
+          >
+            <div
+              className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111827] p-6 md:p-8"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h2 id="delete-account-title" className="text-lg font-bold text-white">Delete Account</h2>
+                <button
+                  id="delete-modal-close"
+                  type="button"
+                  className="w-8 h-8 rounded-full bg-red-900 text-white hover:bg-red-800 transition flex items-center justify-center"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deletingAccount}
+                  aria-label="Close delete account modal"
+                >
+                  <span className="text-lg leading-none font-semibold" aria-hidden="true">×</span>
+                </button>
+              </div>
+
+              <div className="rounded-xl border border-red-800/60 bg-red-950/40 px-4 py-3 mb-6">
+                <p id="delete-account-message" className="text-sm text-red-300 font-semibold">
+                  Are you sure you want to delete your account? This will permanently delete all your workout data and cannot be undone.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  id="delete-modal-cancel"
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deletingAccount}
+                  className="flex-1 px-4 py-2 rounded-lg bg-transparent border border-gray-600 text-white hover:bg-white/10 disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  id="delete-modal-confirm"
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                  className="flex-1 px-4 py-2 rounded-lg bg-red-900/50 border border-red-800 text-red-400 hover:bg-red-900/70 disabled:opacity-60"
+                >
+                  {deletingAccount ? 'Deleting Account...' : 'Yes, Delete My Account'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

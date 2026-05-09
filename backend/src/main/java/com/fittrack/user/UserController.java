@@ -3,10 +3,10 @@ package com.fittrack.user;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import com.fittrack.user.UpdateProfileRequestDTO;
-import com.fittrack.user.UserResponseDTO;
-import com.fittrack.user.UserService;
+import com.fittrack.shared.security.FittrackUserDetails;
 
 import jakarta.validation.Valid;
 
@@ -33,7 +32,7 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UserResponseDTO> getCurrentUser(@AuthenticationPrincipal FittrackUserDetails userDetails) {
         return ResponseEntity.ok(userService.getCurrentUser(userDetails.getUsername()));
     }
 
@@ -41,7 +40,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponseDTO> updateProfile(
             @Valid @RequestBody UpdateProfileRequestDTO request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal FittrackUserDetails userDetails
     ) {
         return ResponseEntity.ok(userService.updateProfile(userDetails.getUsername(), request));
     }
@@ -57,8 +56,15 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, String>> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal FittrackUserDetails userDetails
+    ) {
+        if (userDetails == null || userDetails.getId() == null || !id.equals(userDetails.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own account.");
+        }
+
         userService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
     }
