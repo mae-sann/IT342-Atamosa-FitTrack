@@ -92,6 +92,34 @@ public class WorkoutService {
         return toSummaryResponse(savedWorkout, loadExerciseGroups());
     }
 
+    @Transactional
+    public WorkoutResponseDTO updateWorkout(String email, Long id, WorkoutSaveRequestDTO request) {
+        Workout workout = workoutRepository.findByIdAndUserEmail(id, email)
+                .orElseThrow(() -> new ResourceNotFoundException("Workout not found"));
+
+        // Update basic fields
+        workout.setWorkoutDate(request.workoutDate());
+        workout.setTitle(resolveWorkoutTitle(request.workoutName()));
+
+        // Remove existing logs
+        workoutLogRepository.deleteByWorkoutId(workout.getId());
+
+        // Save new logs
+        if (request.logs() != null && !request.logs().isEmpty()) {
+            List<WorkoutLog> workoutLogs = request.logs().stream()
+                    .map(logRequest -> toWorkoutLog(workout, logRequest))
+                    .toList();
+
+            List<WorkoutLog> savedLogs = workoutLogRepository.saveAll(workoutLogs);
+            workout.setLogs(savedLogs);
+        } else {
+            workout.setLogs(List.of());
+        }
+
+        Workout updated = workoutRepository.save(workout);
+        return toSummaryResponse(updated, loadExerciseGroups());
+    }
+
     private WorkoutLog toWorkoutLog(Workout workout, WorkoutSaveRequestDTO.WorkoutLogSaveRequestDTO logRequest) {
         if (logRequest.exerciseName() == null || logRequest.exerciseName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise name is required");

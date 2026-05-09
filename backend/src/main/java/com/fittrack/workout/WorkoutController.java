@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,6 +71,19 @@ public class WorkoutController {
                 "item", savedWorkout
         ));
     }
+
+        @PutMapping("/{id}")
+        public ResponseEntity<Map<String, Object>> updateWorkout(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody WorkoutSaveRequestDTO request
+        ) {
+        var updated = workoutService.updateWorkout(authentication.getName(), id, request);
+        return ResponseEntity.ok(Map.of(
+            "message", "Workout updated successfully",
+            "item", updated
+        ));
+        }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteWorkout(

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import api from '../../shared/services/api';
 import '../../shared/styles/dashboard.css';
 
@@ -43,6 +43,7 @@ const normalizeSelectedExercises = (payload) => {
 export default function CreateWorkout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { workoutId: workoutIdParam } = useParams();
   const [workoutName, setWorkoutName] = useState('');
   const [workoutDate, setWorkoutDate] = useState(toIsoDate(new Date()));
   const [exercises, setExercises] = useState([]);
@@ -55,6 +56,10 @@ export default function CreateWorkout() {
   const [selectedExerciseId, setSelectedExerciseId] = useState('');
   const [setsInput, setSetsInput] = useState(3);
   const [repsInput, setRepsInput] = useState(10);
+  const [editingWorkoutId, setEditingWorkoutId] = useState(() => {
+    const stateWorkoutId = location.state?.prefillWorkout?.id;
+    return stateWorkoutId ?? workoutIdParam ?? null;
+  });
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -104,6 +109,11 @@ export default function CreateWorkout() {
   }, []);
 
   useEffect(() => {
+    if (workoutIdParam == null || workoutIdParam === '') return;
+    setEditingWorkoutId(workoutIdParam);
+  }, [workoutIdParam]);
+
+  useEffect(() => {
     const prefillWorkout = location.state?.prefillWorkout;
     if (!prefillWorkout || !Array.isArray(prefillWorkout.logs)) return;
 
@@ -121,10 +131,11 @@ export default function CreateWorkout() {
     setWorkoutName(prefillWorkout.title || '');
     setWorkoutDate(safeDate);
     setExercises(prefilledExercises);
+    setEditingWorkoutId(prefillWorkout.id ?? workoutIdParam ?? null);
     showToast('Workout loaded. You can update and save it as a new entry.');
 
     navigate(location.pathname, { replace: true, state: {} });
-  }, [location.pathname, location.state, navigate]);
+  }, [location.pathname, location.state, navigate, workoutIdParam]);
 
   useEffect(() => {
     if (!toastVisible) return undefined;
@@ -242,7 +253,12 @@ export default function CreateWorkout() {
 
     try {
       setLoading(true);
-      await api.post('/api/workouts', payload);
+      const hasExistingWorkoutId = editingWorkoutId != null && editingWorkoutId !== '';
+      if (hasExistingWorkoutId) {
+        await api.put(`/api/workouts/${editingWorkoutId}`, payload);
+      } else {
+        await api.post('/api/workouts', payload);
+      }
       localStorage.removeItem('selected_workout_exercises');
       showToast('Workout saved successfully!');
       setTimeout(() => {
