@@ -257,10 +257,24 @@ export default function WorkoutHistory() {
   const stats = useMemo(() => {
     const totalWorkouts = workouts.length;
     const totalExercises = workouts.reduce((sum, workout) => sum + (workout.totalExercises || 0), 0);
+
+    const now = new Date();
+    const day = now.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    const weekStart = new Date(now);
+    weekStart.setHours(0, 0, 0, 0);
+    weekStart.setDate(now.getDate() + mondayOffset);
+
+    const thisWeek = workouts.filter((workout) => {
+      const workoutDate = new Date(workout.workoutDate || workout.workout_date);
+      if (Number.isNaN(workoutDate.getTime())) return false;
+      return workoutDate >= weekStart && workoutDate <= now;
+    }).length;
+
     return {
       totalWorkouts,
       totalExercises,
-      totalTime: '--',
+      thisWeek,
     };
   }, [workouts]);
 
@@ -382,8 +396,8 @@ export default function WorkoutHistory() {
               <div className="text-xs text-gray-400 mt-1">Exercises Done</div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-              <div className="text-2xl font-black text-white">{stats.totalTime}</div>
-              <div className="text-xs text-gray-400 mt-1">Total Time</div>
+              <div className="text-2xl font-black text-white">{stats.thisWeek}</div>
+              <div className="text-xs text-gray-400 mt-1">This Week</div>
             </div>
           </div>
 
