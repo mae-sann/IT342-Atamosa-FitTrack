@@ -10,18 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fittrack.workout.WorkoutDetailResponseDTO;
-import com.fittrack.workout.WorkoutLogDTO;
-import com.fittrack.workout.WorkoutResponseDTO;
-import com.fittrack.workout.WorkoutSaveRequestDTO;
+import com.fittrack.exercise.ExerciseRepository;
 import com.fittrack.shared.entity.Exercise;
 import com.fittrack.shared.entity.Workout;
 import com.fittrack.shared.entity.WorkoutLog;
-import com.fittrack.exercise.ExerciseRepository;
-import com.fittrack.user.UserRepository;
-import com.fittrack.workout.WorkoutLogRepository;
-import com.fittrack.workout.WorkoutRepository;
 import com.fittrack.shared.exception.ResourceNotFoundException;
+import com.fittrack.user.UserRepository;
 
 @Service
 public class WorkoutService {
