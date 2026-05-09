@@ -414,7 +414,20 @@ export default function CreateWorkout() {
 
             {exercises.length === 0 ? (
               <div className="text-center py-8 text-gray-500 text-sm">
-                <div className="text-4xl mb-2">🏋️</div>
+                <svg
+                  className="w-12 h-12 text-gray-600 mx-auto mb-3 opacity-50"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M12 8v8"></path>
+                  <path d="M8 12h8"></path>
+                </svg>
                 <p>No exercises added yet. Select exercises above to build your workout.</p>
               </div>
             ) : (
