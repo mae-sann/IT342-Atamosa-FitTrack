@@ -42,6 +42,12 @@ interface WorkoutApiService {
     suspend fun deleteWorkout(
         @Path("id") id: Long
     ): Response<GenericResponse>
+
+    @PUT("workouts/{id}")
+    suspend fun updateWorkout(
+        @Path("id") id: Long,
+        @Body request: CreateWorkoutRequest
+    ): Response<SingleWorkoutResponse>
 }
 
 // ── EXERCISES ──

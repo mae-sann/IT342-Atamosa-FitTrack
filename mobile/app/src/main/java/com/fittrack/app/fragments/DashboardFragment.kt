@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.app.AlertDialog
 
 class DashboardFragment : Fragment() {
 
@@ -277,7 +278,9 @@ class DashboardFragment : Fragment() {
             // Exercise names preview
             val names = workout.logs
                 ?.take(3)
-                ?.joinToString(" · ") { it.exerciseName }
+                ?.mapNotNull { it.exerciseName?.trim()?.takeIf { name -> name.isNotEmpty() } }
+                ?.takeIf { it.isNotEmpty() }
+                ?.joinToString(" · ")
                 ?: "No exercises"
             itemView.findViewById<TextView>(R.id.tvExerciseNames).text = names
 
@@ -287,17 +290,61 @@ class DashboardFragment : Fragment() {
             tvCategory.text = category
             setCategoryBadge(tvCategory, category)
 
-            // Edit button
+            // Edit button — navigate to CreateWorkoutActivity in edit mode
             itemView.findViewById<Button>(R.id.btnEditWorkout).setOnClickListener {
-                Toast.makeText(activity, "Edit coming soon", Toast.LENGTH_SHORT).show()
+                val intent = Intent(activity, CreateWorkoutActivity::class.java)
+                intent.putExtra("WORKOUT_ID", workout.id)
+                startActivity(intent)
             }
 
-            // Delete button
+// Delete button — confirm then delete
             itemView.findViewById<Button>(R.id.btnDeleteWorkout).setOnClickListener {
-                Toast.makeText(activity, "Delete coming soon", Toast.LENGTH_SHORT).show()
+                android.app.AlertDialog.Builder(activity)
+                    .setTitle("Delete Workout")
+                    .setMessage("Are you sure you want to delete this workout?")
+                    .setPositiveButton("Delete") { _, _ ->
+                        deleteWorkoutFromDashboard(workout.id)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
             }
-
             layoutRecentWorkouts.addView(itemView)
+        }
+    }
+
+    private fun deleteWorkoutFromDashboard(workoutId: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val service  = RetrofitClient.getWorkoutService(tokenManager)
+                val response = service.deleteWorkout(workoutId)
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(
+                            activity,
+                            "Workout deleted",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        // Refresh dashboard
+                        loadWorkouts()
+                        loadGoals()
+                    } else {
+                        Toast.makeText(
+                            activity,
+                            "Failed to delete workout",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        activity,
+                        "Error: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 
@@ -305,6 +352,7 @@ class DashboardFragment : Fragment() {
         layoutEmptyWorkouts.visibility  = View.VISIBLE
         layoutRecentWorkouts.visibility = View.GONE
     }
+
 
     // ── LOAD GOALS ─────────────────────────────────────────
     private fun loadGoals() {

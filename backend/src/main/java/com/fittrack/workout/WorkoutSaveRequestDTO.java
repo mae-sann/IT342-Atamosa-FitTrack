@@ -1,6 +1,5 @@
 package com.fittrack.workout;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -10,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record WorkoutSaveRequestDTO(
         @NotNull(message = "Workout date is required")
-        LocalDateTime workoutDate,
+        String workoutDate,  // Accept as String - can be "2026-05-10" or "2026-05-10T16:15:45"
 
         String workoutName,
 

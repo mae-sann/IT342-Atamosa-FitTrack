@@ -1,5 +1,8 @@
 package com.fittrack.workout;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +71,7 @@ public class WorkoutService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Workout workout = new Workout();
-        workout.setWorkoutDate(request.workoutDate());
+        workout.setWorkoutDate(parseWorkoutDate(request.workoutDate()));
         workout.setTitle(resolveWorkoutTitle(request.workoutName()));
         workout.setUser(user);
 
@@ -92,7 +95,7 @@ public class WorkoutService {
                 .orElseThrow(() -> new ResourceNotFoundException("Workout not found"));
 
         // Update basic fields
-        workout.setWorkoutDate(request.workoutDate());
+        workout.setWorkoutDate(parseWorkoutDate(request.workoutDate()));
         workout.setTitle(resolveWorkoutTitle(request.workoutName()));
 
         // Remove existing logs
@@ -112,6 +115,32 @@ public class WorkoutService {
 
         Workout updated = workoutRepository.save(workout);
         return toSummaryResponse(updated, loadExerciseGroups());
+    }
+
+    private LocalDateTime parseWorkoutDate(String rawWorkoutDate) {
+        if (rawWorkoutDate == null || rawWorkoutDate.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Workout date is required"
+            );
+        }
+
+        String trimmed = rawWorkoutDate.trim();
+
+        try {
+            // Supports payload like: 2026-05-10T16:15:45
+            return LocalDateTime.parse(trimmed);
+        } catch (DateTimeParseException ignored) {
+            try {
+                // Supports payload like: 2026-05-10 (Android app format)
+                return LocalDate.parse(trimmed).atStartOfDay();
+            } catch (DateTimeParseException ex) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid workoutDate format. Use yyyy-MM-dd or yyyy-MM-ddTHH:mm:ss"
+                );
+            }
+        }
     }
 
     private WorkoutLog toWorkoutLog(Workout workout, WorkoutSaveRequestDTO.WorkoutLogSaveRequestDTO logRequest) {

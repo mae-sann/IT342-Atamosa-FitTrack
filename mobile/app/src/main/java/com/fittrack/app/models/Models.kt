@@ -65,16 +65,16 @@ data class UserResponse(
 
 data class WorkoutResponse(
     val id: Long,
-    @SerializedName("workout_date") val workoutDate: String,
+    @SerializedName(value = "workoutDate", alternate = ["workout_date"]) val workoutDate: String?,
     val title: String?,
-    @SerializedName("created_at") val createdAt: String?,
+    @SerializedName(value = "createdAt", alternate = ["created_at"]) val createdAt: String?,
     val logs: List<WorkoutLogResponse>?
 )
 
 data class WorkoutLogResponse(
     val id: Long?,
-    @SerializedName("exercise_name") val exerciseName: String,
-    @SerializedName("muscle_group") val muscleGroup: String?,
+    @SerializedName(value = "exerciseName", alternate = ["exercise_name"]) val exerciseName: String?,
+    @SerializedName(value = "muscleGroup", alternate = ["muscle_group"]) val muscleGroup: String?,
     val sets: Int,
     val reps: Int
 )

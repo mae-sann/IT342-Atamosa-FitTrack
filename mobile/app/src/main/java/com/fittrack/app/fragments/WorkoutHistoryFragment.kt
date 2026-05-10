@@ -145,7 +145,7 @@ class WorkoutHistoryFragment : Fragment() {
         val filtered = allWorkouts.filter { workout ->
             val dateMatch = workout.workoutDate?.contains(query, ignoreCase = true) == true
             val exerciseMatch = workout.logs?.any {
-                it.exerciseName.contains(query, ignoreCase = true)
+                it.exerciseName?.contains(query, ignoreCase = true) == true
             } == true
             val categoryMatch = deriveCategoryFromLogs(workout.logs)
                 .contains(query, ignoreCase = true)
@@ -187,7 +187,9 @@ class WorkoutHistoryFragment : Fragment() {
             // Exercise names
             val names = workout.logs
                 ?.take(3)
-                ?.joinToString(" · ") { it.exerciseName }
+                ?.mapNotNull { it.exerciseName?.trim()?.takeIf { name -> name.isNotEmpty() } }
+                ?.takeIf { it.isNotEmpty() }
+                ?.joinToString(" · ")
                 ?: "No exercises recorded"
             itemView.findViewById<TextView>(R.id.tvExerciseNames).text = names
 

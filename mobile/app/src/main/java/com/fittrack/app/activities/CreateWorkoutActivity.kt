@@ -36,9 +36,9 @@ class CreateWorkoutActivity : Activity() {
 
     private lateinit var btnBack: Button
     private lateinit var btnSaveWorkout: Button
+    private lateinit var etWorkoutName: EditText
     private lateinit var btnPickDate: Button
     private lateinit var btnBrowseExercise: Button
-    private lateinit var etWorkoutName: EditText
     private lateinit var tvSelectedExercise: TextView
     private lateinit var etSets: EditText
     private lateinit var etReps: EditText
@@ -49,8 +49,11 @@ class CreateWorkoutActivity : Activity() {
 
     private var selectedDate: String = ""
     private var selectedExerciseName: String = ""
-    private var selectedMuscleGroup: String = ""
     private val exerciseItems = mutableListOf<WorkoutExerciseItem>()
+
+    // Edit mode — set when WORKOUT_ID is passed via intent
+    private var editWorkoutId: Long = -1L
+    private var isEditMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,24 +61,34 @@ class CreateWorkoutActivity : Activity() {
 
         tokenManager = TokenManager(this)
 
-        btnBack = findViewById(R.id.btnBack)
-        btnSaveWorkout = findViewById(R.id.btnSaveWorkout)
-        btnPickDate = findViewById(R.id.btnPickDate)
-        btnBrowseExercise = findViewById(R.id.btnBrowseExercise)
-        etWorkoutName = findViewById(R.id.etWorkoutName)
-        tvSelectedExercise = findViewById(R.id.tvSelectedExercise)
-        etSets = findViewById(R.id.etSets)
-        etReps = findViewById(R.id.etReps)
-        btnAddExercise = findViewById(R.id.btnAddExercise)
-        tvExerciseCount = findViewById(R.id.tvExerciseCount)
-        layoutExerciseEmpty = findViewById(R.id.layoutExerciseEmpty)
-        layoutExerciseList = findViewById(R.id.layoutExerciseList)
+        // Check if launched in edit mode
+        editWorkoutId = intent.getLongExtra("WORKOUT_ID", -1L)
+        isEditMode    = editWorkoutId != -1L
 
-        // Default to today
-        val todayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        selectedDate = todayFormat.format(Date())
+        btnBack             = findViewById(R.id.btnBack)
+        btnSaveWorkout      = findViewById(R.id.btnSaveWorkout)
+        etWorkoutName       = findViewById(R.id.etWorkoutName)
+        btnPickDate         = findViewById(R.id.btnPickDate)
+        btnBrowseExercise   = findViewById(R.id.btnBrowseExercise)
+        tvSelectedExercise  = findViewById(R.id.tvSelectedExercise)
+        etSets              = findViewById(R.id.etSets)
+        etReps              = findViewById(R.id.etReps)
+        btnAddExercise      = findViewById(R.id.btnAddExercise)
+        tvExerciseCount     = findViewById(R.id.tvExerciseCount)
+        layoutExerciseEmpty = findViewById(R.id.layoutExerciseEmpty)
+        layoutExerciseList  = findViewById(R.id.layoutExerciseList)
+
+        // Default date to today
+        val todayFormat   = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val displayFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-        btnPickDate.text = displayFormat.format(Date())
+        selectedDate      = todayFormat.format(Date())
+        btnPickDate.text  = displayFormat.format(Date())
+
+        // Update title and save button for edit mode
+        if (isEditMode) {
+            btnSaveWorkout.text = "💾 Update"
+            loadExistingWorkout(editWorkoutId)
+        }
 
         btnBack.setOnClickListener { finish() }
 
@@ -90,7 +103,93 @@ class CreateWorkoutActivity : Activity() {
 
         btnAddExercise.setOnClickListener { addExercise() }
 
-        btnSaveWorkout.setOnClickListener { saveWorkout() }
+        btnSaveWorkout.setOnClickListener {
+            if (isEditMode) updateWorkout()
+            else saveWorkout()
+        }
+    }
+
+    // ── LOAD EXISTING WORKOUT FOR EDIT ─────────────────────
+    private fun loadExistingWorkout(workoutId: Long) {
+        btnSaveWorkout.isEnabled = false
+        btnSaveWorkout.text      = "Loading..."
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                android.util.Log.d("CreateWorkout", "Loading workout ID: $workoutId")
+                val service  = RetrofitClient.getWorkoutService(tokenManager)
+                val response = service.getWorkoutById(workoutId)
+                android.util.Log.d("CreateWorkout", "API response code: ${response.code()}")
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val workout = response.body()?.data ?: response.body()?.item
+
+                        if (workout != null) {
+                            if (!workout.title.isNullOrBlank() && workout.title != "Workout Session") {
+                                etWorkoutName.setText(workout.title)
+                            }
+
+                            // Set date
+                            val dateStr = workout.workoutDate ?: ""
+                            selectedDate    = dateStr.take(10)
+
+                            // Format for display
+                            try {
+                                val inFmt  = SimpleDateFormat(
+                                    "yyyy-MM-dd", Locale.getDefault()
+                                )
+                                val outFmt = SimpleDateFormat(
+                                    "MMM d, yyyy", Locale.getDefault()
+                                )
+                                val parsed = inFmt.parse(selectedDate)
+                                btnPickDate.text =
+                                    if (parsed != null) outFmt.format(parsed)
+                                    else selectedDate
+                            } catch (e: Exception) {
+                                btnPickDate.text = selectedDate
+                            }
+
+                            // Pre-fill exercises from logs
+                            exerciseItems.clear()
+                            workout.logs?.forEach { log ->
+                                exerciseItems.add(
+                                    WorkoutExerciseItem(
+                                        exerciseName = log.exerciseName ?: "Exercise",
+                                        muscleGroup  = log.muscleGroup ?: "",
+                                        sets         = log.sets,
+                                        reps         = log.reps
+                                    )
+                                )
+                            }
+                            refreshExerciseList()
+                        }
+
+                        btnSaveWorkout.isEnabled = true
+                        btnSaveWorkout.text      = "💾 Update"
+
+                    } else {
+                        Toast.makeText(
+                            this@CreateWorkoutActivity,
+                            "Failed to load workout",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        btnSaveWorkout.isEnabled = true
+                        btnSaveWorkout.text      = "💾 Update"
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@CreateWorkoutActivity,
+                        "Error loading workout: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    btnSaveWorkout.isEnabled = true
+                    btnSaveWorkout.text      = "💾 Update"
+                }
+            }
+        }
     }
 
     // Receive selected exercise from ExerciseLibraryActivity
@@ -101,11 +200,10 @@ class CreateWorkoutActivity : Activity() {
     ) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_EXERCISE && resultCode == RESULT_OK) {
-            val name = data?.getStringExtra("EXERCISE_NAME") ?: return
-            val group = data.getStringExtra("EXERCISE_GROUP") ?: ""
-            selectedExerciseName = name
-            selectedMuscleGroup = group
-            tvSelectedExercise.text = name
+            val name  = data?.getStringExtra("EXERCISE_NAME")  ?: return
+            val group = data.getStringExtra("EXERCISE_GROUP")  ?: ""
+            selectedExerciseName         = name
+            tvSelectedExercise.text      = name
             tvSelectedExercise.setTextColor(getColor(R.color.colorTextPrimary))
         }
     }
@@ -117,9 +215,13 @@ class CreateWorkoutActivity : Activity() {
             { _, year, month, day ->
                 val picked = Calendar.getInstance()
                 picked.set(year, month, day)
-                val apiFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val displayFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-                selectedDate = apiFormat.format(picked.time)
+                val apiFormat     = SimpleDateFormat(
+                    "yyyy-MM-dd", Locale.getDefault()
+                )
+                val displayFormat = SimpleDateFormat(
+                    "MMM d, yyyy", Locale.getDefault()
+                )
+                selectedDate     = apiFormat.format(picked.time)
                 btnPickDate.text = displayFormat.format(picked.time)
             },
             cal.get(Calendar.YEAR),
@@ -130,7 +232,10 @@ class CreateWorkoutActivity : Activity() {
 
     private fun addExercise() {
         if (selectedExerciseName.isEmpty()) {
-            Toast.makeText(this, "Please select an exercise first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this, "Please select an exercise first",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
         val sets = etSets.text.toString().toIntOrNull()
@@ -145,17 +250,17 @@ class CreateWorkoutActivity : Activity() {
             return
         }
 
-        val item = WorkoutExerciseItem(
-            exerciseName = selectedExerciseName,
-            muscleGroup = selectedMuscleGroup,
-            sets = sets,
-            reps = reps
+        exerciseItems.add(
+            WorkoutExerciseItem(
+                exerciseName = selectedExerciseName,
+                muscleGroup  = "",
+                sets         = sets,
+                reps         = reps
+            )
         )
-        exerciseItems.add(item)
 
-        // Reset fields
+        // Reset input fields
         selectedExerciseName = ""
-        selectedMuscleGroup = ""
         tvSelectedExercise.text = "No exercise selected"
         tvSelectedExercise.setTextColor(getColor(R.color.colorTextMuted))
         etSets.text.clear()
@@ -167,7 +272,8 @@ class CreateWorkoutActivity : Activity() {
     private fun refreshExerciseList() {
         layoutExerciseList.removeAllViews()
         val count = exerciseItems.size
-        tvExerciseCount.text = "$count exercise${if (count != 1) "s" else ""}"
+        tvExerciseCount.text =
+            "$count exercise${if (count != 1) "s" else ""}"
 
         if (count == 0) {
             layoutExerciseEmpty.visibility = View.VISIBLE
@@ -184,68 +290,40 @@ class CreateWorkoutActivity : Activity() {
             )
             row.findViewById<TextView>(R.id.tvExerciseLetter).text =
                 item.exerciseName.firstOrNull()?.uppercase() ?: "?"
-            row.findViewById<TextView>(R.id.tvExerciseName).text = item.exerciseName
-            row.findViewById<TextView>(R.id.tvSetsReps).text = "${item.sets} sets × ${item.reps} reps"
-            row.findViewById<Button>(R.id.btnRemoveExercise).setOnClickListener {
-                exerciseItems.removeAt(index)
-                refreshExerciseList()
-            }
+            row.findViewById<TextView>(R.id.tvExerciseName).text =
+                item.exerciseName
+            row.findViewById<TextView>(R.id.tvSetsReps).text =
+                "${item.sets} sets × ${item.reps} reps"
+            row.findViewById<Button>(R.id.btnRemoveExercise)
+                .setOnClickListener {
+                    exerciseItems.removeAt(index)
+                    refreshExerciseList()
+                }
             layoutExerciseList.addView(row)
         }
     }
 
+    // ── CREATE NEW WORKOUT ──────────────────────────────────
     private fun saveWorkout() {
-        // 🔍 ADD THIS DEBUG CODE FIRST
-        val token = tokenManager.getToken()
-        android.util.Log.d("CreateWorkout", "Token exists: ${token != null}")
-        android.util.Log.d("CreateWorkout", "Token: ${token?.take(20)}...")
-
-        if (token == null) {
-            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show()
-            return
-        }
-        // 🔍 END OF DEBUG CODE
-
         if (exerciseItems.isEmpty()) {
-            Toast.makeText(this, "Add at least one exercise", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this, "Add at least one exercise",
+                Toast.LENGTH_SHORT
+            ).show()
             return
-        }
-
-        // Get workout name
-        val workoutName = etWorkoutName.text.toString().trim()
-        val finalWorkoutName = if (workoutName.isEmpty()) {
-            val firstExercise = exerciseItems.firstOrNull()?.exerciseName?.take(15) ?: "Workout"
-            val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
-            "$firstExercise - ${dateFormat.format(Date())}"
-        } else {
-            workoutName
         }
 
         btnSaveWorkout.isEnabled = false
-        btnSaveWorkout.text = "Saving..."
-
-        val formattedDate = "${selectedDate}T00:00:00"
-
-        val request = CreateWorkoutRequest(
-            workoutDate = formattedDate,
-            workoutName = finalWorkoutName,
-            logs = exerciseItems.map {
-                WorkoutLogRequest(
-                    exerciseName = it.exerciseName,
-                    sets = it.sets,
-                    reps = it.reps
-                )
-            }
-        )
+        btnSaveWorkout.text      = "Saving..."
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val service = RetrofitClient.getWorkoutService(tokenManager)
-                val response = service.createWorkout(request)
+                val service  = RetrofitClient.getWorkoutService(tokenManager)
+                val response = service.createWorkout(buildRequest())
 
                 withContext(Dispatchers.Main) {
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text = "💾 Save"
+                    btnSaveWorkout.text      = "💾 Save"
 
                     if (response.isSuccessful) {
                         Toast.makeText(
@@ -253,14 +331,11 @@ class CreateWorkoutActivity : Activity() {
                             "Workout saved! 💪",
                             Toast.LENGTH_SHORT
                         ).show()
-                        setResult(Activity.RESULT_OK)
                         finish()
                     } else {
-                        val errorBody = response.errorBody()?.string()
-                        android.util.Log.e("CreateWorkout", "Error: $errorBody")
                         Toast.makeText(
                             this@CreateWorkoutActivity,
-                            "Failed to save workout: ${response.code()}",
+                            "Failed to save workout",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -268,8 +343,7 @@ class CreateWorkoutActivity : Activity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text = "💾 Save"
-                    android.util.Log.e("CreateWorkout", "Exception: ${e.message}", e)
+                    btnSaveWorkout.text      = "💾 Save"
                     Toast.makeText(
                         this@CreateWorkoutActivity,
                         "Error: ${e.message}",
@@ -279,4 +353,71 @@ class CreateWorkoutActivity : Activity() {
             }
         }
     }
+
+    // ── UPDATE EXISTING WORKOUT ─────────────────────────────
+    private fun updateWorkout() {
+        if (exerciseItems.isEmpty()) {
+            Toast.makeText(
+                this, "Add at least one exercise",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        btnSaveWorkout.isEnabled = false
+        btnSaveWorkout.text      = "Updating..."
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val service  = RetrofitClient.getWorkoutService(tokenManager)
+                val response = service.updateWorkout(
+                    editWorkoutId,
+                    buildRequest()
+                )
+
+                withContext(Dispatchers.Main) {
+                    btnSaveWorkout.isEnabled = true
+                    btnSaveWorkout.text      = "💾 Update"
+
+                    if (response.isSuccessful) {
+                        Toast.makeText(
+                            this@CreateWorkoutActivity,
+                            "Workout updated! ✅",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@CreateWorkoutActivity,
+                            "Failed to update workout",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    btnSaveWorkout.isEnabled = true
+                    btnSaveWorkout.text      = "💾 Update"
+                    Toast.makeText(
+                        this@CreateWorkoutActivity,
+                        "Error: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    // ── BUILD REQUEST OBJECT ────────────────────────────────
+    private fun buildRequest() = CreateWorkoutRequest(
+        workoutDate = selectedDate,
+        workoutName = etWorkoutName.text.toString().trim().ifBlank { null },
+        logs        = exerciseItems.map {
+            WorkoutLogRequest(
+                exerciseName = it.exerciseName,
+                sets         = it.sets,
+                reps         = it.reps
+            )
+        }
+    )
 }
