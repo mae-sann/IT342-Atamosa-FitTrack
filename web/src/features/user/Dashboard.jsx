@@ -262,7 +262,9 @@ export default function Dashboard() {
         api.get('/api/v1/workouts'),
         api.get('/api/v1/goals'),
       ]);
-      setUser(userRes.data);
+      // API returns { data: { user }, success, error }, so extract the actual user object
+      const userData = userRes.data?.data || userRes.data;
+      setUser(userData);
       setWorkouts(normalizeWorkouts(workoutsRes.data));
       setGoals(normalizeGoals(goalsRes.data));
     } catch (err) {
@@ -305,7 +307,15 @@ export default function Dashboard() {
   const hour         = new Date().getHours();
   const greeting     = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const emoji        = hour < 12 ? '👋' : '💪';
-  const fullName     = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || 'Athlete';
+  
+  const getEmailPrefix = (email) => {
+    if (!email) return 'User';
+    const prefix = email.split('@')[0];
+    // Convert dots, underscores, and hyphens to spaces for better readability
+    return prefix.replace(/[._-]/g, ' ').trim() || 'User';
+  };
+  
+  const fullName     = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || getEmailPrefix(user.email) || 'User';
   const firstName    = fullName.split(' ')[0];
   const displayDate  = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',

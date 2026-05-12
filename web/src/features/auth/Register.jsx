@@ -73,13 +73,19 @@ export default function Register() {
     }
     try {
       setLoading(true);
-      await authService.register({
+      const response = await authService.register({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
         password: formData.password,
         role: formData.role,
       });
+      
+      // Store registered user info in sessionStorage for display on login page
+      if (response?.data?.user) {
+        sessionStorage.setItem('registeredUser', JSON.stringify(response.data.user));
+      }
+      
       navigate('/login?registered=true');
     } catch (err) {
       if (err.response?.status === 409) {

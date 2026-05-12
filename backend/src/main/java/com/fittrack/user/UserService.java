@@ -2,19 +2,18 @@ package com.fittrack.user;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fittrack.user.UpdateProfileRequestDTO;
-import com.fittrack.user.UserResponseDTO;
 import com.fittrack.shared.entity.User;
-import com.fittrack.user.UserRepository;
 import com.fittrack.shared.exception.ResourceNotFoundException;
-import com.fittrack.user.UserMapper;
 
 @Service
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -23,8 +22,19 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponseDTO getCurrentUser(String email) {
+        logger.debug("Fetching user with email: {}", email);
+        
+        if (email == null || email.isEmpty()) {
+            throw new ResourceNotFoundException("Email is required");
+        }
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    logger.warn("User not found with email: {}", email);
+                    return new ResourceNotFoundException("User with email '" + email + "' not found in database");
+                });
+        
+        logger.debug("User found: {} ({})", user.getEmail(), user.getId());
         return UserMapper.toUserResponse(user);
     }
 

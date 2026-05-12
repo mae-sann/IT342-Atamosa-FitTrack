@@ -1,11 +1,17 @@
+function getEmailPrefix(email) {
+  if (!email) return 'User';
+  const prefix = email.split('@')[0];
+  return prefix.replace(/[._-]/g, ' ').trim() || 'User';
+}
+
 function getDisplayName(user) {
   if (!user) return 'Loading...';
   const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-  return fullName || user.name || 'Athlete';
+  return fullName || user.name || getEmailPrefix(user.email) || 'User';
 }
 
 function getInitials(user) {
-  const fullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || '';
+  const fullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || getEmailPrefix(user?.email) || '';
   if (!fullName) return '...';
   return fullName
     .split(' ')

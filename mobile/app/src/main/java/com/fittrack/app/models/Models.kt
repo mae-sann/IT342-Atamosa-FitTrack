@@ -46,6 +46,7 @@ data class UserData(
     val role: String?,
     val provider: String?,
     val createdAt: String?       // camelCase matches backend
+
 )
 
 data class UpdateProfileRequest(

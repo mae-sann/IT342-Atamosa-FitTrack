@@ -3,6 +3,8 @@ package com.fittrack.shared.config;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fittrack.shared.security.CustomUserDetailsService;
 import com.fittrack.shared.security.JwtAuthenticationFilter;
@@ -34,6 +37,8 @@ import com.fittrack.shared.security.OAuth2LoginSuccessHandler;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService customUserDetailsService;
@@ -99,6 +104,15 @@ public class SecurityConfig {
                 .userService(oAuth2UserService())
             )
             .successHandler(oAuth2LoginSuccessHandler)
+            .failureHandler((request, response, exception) -> {
+                LOGGER.error("OAuth2 login failed: {}", exception.getMessage(), exception);
+                String errorRedirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/login")
+                    .queryParam("error", "oauth_failed")
+                    .queryParam("message", exception.getMessage())
+                    .build(true)
+                    .toUriString();
+                response.sendRedirect(errorRedirectUrl);
+            })
         )
 
         .addFilterBefore(

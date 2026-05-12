@@ -20,6 +20,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ProfileFragment : Fragment() {
 
@@ -70,65 +72,209 @@ class ProfileFragment : Fragment() {
         tvProfileSuccess = view.findViewById(R.id.tvProfileSuccess)
         btnLogout        = view.findViewById(R.id.btnLogout)
 
-        loadUserInfo()
+        // Show cached data instantly — no blank screen while loading
+        loadCachedUserInfo()
+
+        // Fetch fresh data from API including createdAt
+        fetchUserFromApi()
 
         btnEditProfile.setOnClickListener { toggleEditing(true) }
-
         btnSaveProfile.setOnClickListener { saveProfile() }
-
-        btnLogout.setOnClickListener { confirmLogout() }
+        btnLogout.setOnClickListener     { confirmLogout() }
     }
 
-    private fun loadUserInfo() {
+    // ── LOAD FROM CACHE (instant, no network needed) ───────
+    private fun loadCachedUserInfo() {
         val firstName = tokenManager.getFirstName() ?: ""
         val lastName  = tokenManager.getLastName()  ?: ""
         val email     = tokenManager.getEmail()     ?: ""
-        val role      = tokenManager.getRole()      ?: "ROLE_USER"
         val provider  = tokenManager.getProvider()  ?: "LOCAL"
 
-        // Avatar
-        tvAvatarInitials.text = tokenManager.getInitials().ifEmpty { "?" }
-
-        // Name + email
-        tvProfileName.text  = "$firstName $lastName".trim()
-        tvProfileEmail.text = email
-
-        // Role badge
-        tvProfileRole.text = if (tokenManager.isAdmin()) "Admin" else "User"
-
-        // Account type
-        tvAccountType.text = if (provider.uppercase() == "GOOGLE")
+        tvAvatarInitials.text = buildInitials(firstName, lastName)
+        tvProfileName.text    = "$firstName $lastName".trim()
+        tvProfileEmail.text   = email
+        tvProfileRole.text    = if (tokenManager.isAdmin()) "Admin" else "User"
+        tvAccountType.text    = if (provider.uppercase() == "GOOGLE")
             "Google Account" else "Local Account"
 
-        // Google note
         layoutGoogleNote.visibility =
             if (provider.uppercase() == "GOOGLE") View.VISIBLE else View.GONE
 
-        // Form fields
         etFirstName.setText(firstName)
         etLastName.setText(lastName)
         etEmail.setText(email)
+
+        // Display cached member since date, or show loading
+        val cachedCreatedAt = tokenManager.getCreatedAt()
+        tvMemberSince.text = if (!cachedCreatedAt.isNullOrEmpty()) 
+            formatMemberSince(cachedCreatedAt) 
+        else 
+            "Loading..."
     }
 
+    // ── FETCH FROM API ─────────────────────────────────────
+    private fun fetchUserFromApi() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val service  = RetrofitClient.getAuthService(tokenManager)
+                val response = service.getCurrentUser()
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+
+                        // Log full response so we can see exact field names
+                        android.util.Log.d("PROFILE_DEBUG", "Response body: $body")
+                        android.util.Log.d("PROFILE_DEBUG", "Data: ${body?.data}")
+
+                        val user = body?.data ?: run {
+                            tvMemberSince.text = "2026"
+                            return@withContext
+                        }
+
+                        android.util.Log.d("PROFILE_DEBUG", "createdAt: ${user.createdAt}")
+                        android.util.Log.d("PROFILE_DEBUG", "firstName: ${user.firstName}")
+                        android.util.Log.d("PROFILE_DEBUG", "lastName: ${user.lastName}")
+
+                        val firstName = user.firstName ?: ""
+                        val lastName  = user.lastName  ?: ""
+                        val provider  = user.provider  ?: "LOCAL"
+
+                        // Update all UI fields with fresh API data
+                        tvAvatarInitials.text = buildInitials(firstName, lastName)
+                        tvProfileName.text    = "$firstName $lastName".trim()
+                        tvProfileEmail.text   = user.email
+                        tvProfileRole.text    = if (user.role?.uppercase()
+                                ?.contains("ADMIN") == true) "Admin" else "User"
+                        tvAccountType.text    = if (provider.uppercase() == "GOOGLE")
+                            "Google Account" else "Local Account"
+
+                        layoutGoogleNote.visibility =
+                            if (provider.uppercase() == "GOOGLE")
+                                View.VISIBLE else View.GONE
+
+                        etFirstName.setText(firstName)
+                        etLastName.setText(lastName)
+                        etEmail.setText(user.email)
+
+                        // Member since — try createdAt field first
+                        val dateStr = user.createdAt
+                        android.util.Log.d("PROFILE_DEBUG", "dateStr to format: $dateStr")
+                        tvMemberSince.text = formatMemberSince(dateStr)
+
+                        // Update cached values
+                        tokenManager.saveUserInfo(
+                            email     = user.email,
+                            firstName = firstName,
+                            lastName  = lastName,
+                            role      = user.role ?: "ROLE_USER",
+                            provider  = provider,
+                            createdAt = user.createdAt
+                        )
+
+                    } else {
+                        android.util.Log.d("PROFILE_DEBUG",
+                            "API failed: ${response.code()} — ${response.errorBody()?.string()}")
+                        tvMemberSince.text = "2026"
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    android.util.Log.e("PROFILE_DEBUG",
+                        "Exception: ${e.javaClass.simpleName} — ${e.message}")
+                    tvMemberSince.text = "2026"
+                }
+            }
+        }
+    }
+
+    // ── FORMAT MEMBER SINCE ────────────────────────────────
+    // Handles multiple date formats your backend might return
+    private fun formatMemberSince(createdAt: String?): String {
+        android.util.Log.d("PROFILE_DEBUG", "formatMemberSince input: $createdAt")
+
+        if (createdAt.isNullOrEmpty()) return "2026"
+
+        val outputFormat = SimpleDateFormat("MMM yyyy", Locale.getDefault())
+
+        // Try each format until one works
+        val formatStrings = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX",  // with timezone offset
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",   // microseconds no TZ
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",       // milliseconds
+            "yyyy-MM-dd'T'HH:mm:ssX",          // with timezone
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",        // UTC Z
+            "yyyy-MM-dd'T'HH:mm:ss",           // no timezone
+            "yyyy-MM-dd HH:mm:ss",             // space separator
+            "yyyy-MM-dd"                        // date only
+        )
+
+        for (fmt in formatStrings) {
+            try {
+                val parser = SimpleDateFormat(fmt, Locale.getDefault())
+                parser.isLenient = true
+                // Take first 26 chars to avoid parsing issues with long strings
+                val toParse = createdAt.take(26)
+                val parsed  = parser.parse(toParse)
+                if (parsed != null) {
+                    val result = outputFormat.format(parsed)
+                    android.util.Log.d("PROFILE_DEBUG",
+                        "Successfully parsed with format '$fmt' → $result")
+                    return result
+                }
+            } catch (e: Exception) {
+                // Try next format
+                continue
+            }
+        }
+
+        // Last resort — extract year and month directly from the string
+        return try {
+            val year  = createdAt.substring(0, 4)
+            val month = createdAt.substring(5, 7).toInt()
+            val monthNames = listOf("", "Jan", "Feb", "Mar", "Apr", "May",
+                "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+            "${monthNames.getOrElse(month) { "Jan" }} $year"
+        } catch (e: Exception) {
+            android.util.Log.e("PROFILE_DEBUG", "All parsing failed for: $createdAt")
+            createdAt.take(7) // Return "2026-04" as last fallback
+        }
+    }
+
+    private fun buildInitials(firstName: String, lastName: String): String {
+        val f = firstName.firstOrNull()?.uppercaseChar() ?: ""
+        val l = lastName.firstOrNull()?.uppercaseChar()  ?: ""
+        return "$f$l".ifEmpty { "?" }
+    }
+
+    // ── TOGGLE EDIT MODE ───────────────────────────────────
     private fun toggleEditing(editing: Boolean) {
-        isEditing = editing
+        isEditing             = editing
         etFirstName.isEnabled = editing
         etLastName.isEnabled  = editing
-        btnEditProfile.visibility  =
+
+        btnEditProfile.visibility =
             if (editing) View.GONE else View.VISIBLE
-        btnSaveProfile.visibility  =
+        btnSaveProfile.visibility =
             if (editing) View.VISIBLE else View.GONE
         tvProfileSuccess.visibility = View.GONE
     }
 
+    // ── SAVE PROFILE ───────────────────────────────────────
     private fun saveProfile() {
         val firstName = etFirstName.text.toString().trim()
         val lastName  = etLastName.text.toString().trim()
 
         if (firstName.isEmpty() || lastName.isEmpty()) {
-            Toast.makeText(activity, "Name cannot be empty", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                activity, "Name cannot be empty",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
+
+        btnSaveProfile.isEnabled = false
+        btnSaveProfile.text      = "Saving..."
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -141,16 +287,19 @@ class ProfileFragment : Fragment() {
                 )
 
                 withContext(Dispatchers.Main) {
+                    btnSaveProfile.isEnabled = true
+                    btnSaveProfile.text      = "Save Changes"
+
                     if (response.isSuccessful) {
-                        // Update cached values
                         tokenManager.saveUserInfo(
-                            email     = tokenManager.getEmail() ?: "",
+                            email     = tokenManager.getEmail()    ?: "",
                             firstName = firstName,
                             lastName  = lastName,
-                            role      = tokenManager.getRole() ?: "ROLE_USER",
+                            role      = tokenManager.getRole()     ?: "ROLE_USER",
                             provider  = tokenManager.getProvider() ?: "LOCAL"
                         )
-                        loadUserInfo()
+                        tvAvatarInitials.text = buildInitials(firstName, lastName)
+                        tvProfileName.text    = "$firstName $lastName".trim()
                         toggleEditing(false)
                         tvProfileSuccess.visibility = View.VISIBLE
                     } else {
@@ -163,6 +312,8 @@ class ProfileFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    btnSaveProfile.isEnabled = true
+                    btnSaveProfile.text      = "Save Changes"
                     Toast.makeText(
                         activity,
                         "Error: ${e.message}",
@@ -173,6 +324,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    // ── LOGOUT ─────────────────────────────────────────────
     private fun confirmLogout() {
         AlertDialog.Builder(activity)
             .setTitle("Logout")

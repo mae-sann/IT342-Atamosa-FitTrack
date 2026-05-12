@@ -13,24 +13,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fittrack.auth.AuthResponseDTO;
-import com.fittrack.user.ChangePasswordRequestDTO;
-import com.fittrack.auth.LoginRequestDTO;
-import com.fittrack.auth.OAuthLoginResponseDTO;
-import com.fittrack.auth.RegisterRequestDTO;
-import com.fittrack.user.UserResponseDTO;
 import com.fittrack.shared.entity.AuthProvider;
 import com.fittrack.shared.entity.Role;
 import com.fittrack.shared.entity.RoleType;
 import com.fittrack.shared.entity.User;
-import com.fittrack.user.RoleRepository;
-import com.fittrack.user.UserRepository;
 import com.fittrack.shared.exception.DuplicateEmailException;
-import com.fittrack.auth.GoogleTokenVerifier;
 import com.fittrack.shared.exception.UnauthorizedException;
 import com.fittrack.shared.security.JwtService;
+import com.fittrack.user.ChangePasswordRequestDTO;
 import com.fittrack.user.EmailService;
+import com.fittrack.user.RoleRepository;
 import com.fittrack.user.UserMapper;
+import com.fittrack.user.UserRepository;
+import com.fittrack.user.UserResponseDTO;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 @Service
@@ -158,9 +153,21 @@ public class AuthService {
 
     @Transactional
     public OAuthLoginResponseDTO loginWithGoogleProfileResponse(Map<String, Object> attributes) {
-        User user = upsertGoogleUser(attributes);
-        String token = jwtService.generateToken(user);
-        return toOAuthResponse(token, user);
+        try {
+            LOGGER.info("Starting Google OAuth profile processing");
+            User user = upsertGoogleUser(attributes);
+            LOGGER.info("Google user created/updated: {} (ID: {})", user.getEmail(), user.getId());
+            
+            String token = jwtService.generateToken(user);
+            LOGGER.info("JWT token generated for user: {}", user.getEmail());
+            
+            OAuthLoginResponseDTO response = toOAuthResponse(token, user);
+            LOGGER.info("OAuth response created for provider: {}", response.provider());
+            return response;
+        } catch (Exception ex) {
+            LOGGER.error("Error during Google OAuth profile processing: {}", ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     private void sendWelcomeEmailSafely(User user) {
@@ -242,19 +249,32 @@ public class AuthService {
     }
 
     private User createGoogleUser(String email, String providerId, String givenName, String familyName) {
-        User user = new User();
-        user.setEmail(email);
-        user.setFirstName(firstNonBlank(givenName, "Google"));
-        user.setLastName(firstNonBlank(familyName, "User"));
-        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-        user.setRole(RoleType.USER);
-        user.setRoleEntity(resolveLegacyRoleEntity(RoleType.USER));
-        user.setProvider(AuthProvider.GOOGLE);
-        user.setProviderId(firstNonBlank(providerId, UUID.randomUUID().toString()));
+        try {
+            LOGGER.info("Creating new Google user: {} (provider: {})", email, providerId);
+            
+            User user = new User();
+            user.setEmail(email);
+            user.setFirstName(firstNonBlank(givenName, "Google"));
+            user.setLastName(firstNonBlank(familyName, "User"));
+            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setRole(RoleType.USER);
+            
+            Role userRole = resolveLegacyRoleEntity(RoleType.USER);
+            LOGGER.debug("Resolved role entity: {} (ID: {})", userRole.getName(), userRole.getId());
+            user.setRoleEntity(userRole);
+            
+            user.setProvider(AuthProvider.GOOGLE);
+            user.setProviderId(firstNonBlank(providerId, UUID.randomUUID().toString()));
 
-        User savedUser = userRepository.save(user);
-        sendWelcomeEmailSafely(savedUser);
-        return savedUser;
+            User savedUser = userRepository.save(user);
+            LOGGER.info("Google user saved successfully: {} (ID: {})", savedUser.getEmail(), savedUser.getId());
+            
+            sendWelcomeEmailSafely(savedUser);
+            return savedUser;
+        } catch (Exception ex) {
+            LOGGER.error("Error creating Google user: {}", ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     private RoleType resolveRole(String rawRole) {
@@ -266,8 +286,17 @@ public class AuthService {
                 ? RoleType.ROLE_ADMIN
                 : RoleType.ROLE_USER;
 
-        return roleRepository.findByName(legacyRoleType)
-                .orElseGet(() -> roleRepository.save(new Role(legacyRoleType)));
+        LOGGER.debug("Resolving role entity for: {} -> {}", roleType, legacyRoleType);
+        
+        Role role = roleRepository.findByName(legacyRoleType)
+                .orElseGet(() -> {
+                    LOGGER.warn("Role {} not found, creating new role", legacyRoleType);
+                    Role newRole = new Role(legacyRoleType);
+                    return roleRepository.save(newRole);
+                });
+        
+        LOGGER.debug("Role entity resolved: {} (ID: {})", role.getName(), role.getId());
+        return role;
     }
 
     private String getAttribute(Map<String, Object> attributes, String key) {

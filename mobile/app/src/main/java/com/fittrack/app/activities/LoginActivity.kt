@@ -96,7 +96,8 @@ class LoginActivity : Activity() {
                                     firstName = user.firstName ?: "",
                                     lastName = user.lastName ?: "",
                                     role = "ROLE_USER",
-                                    provider = user.provider ?: "LOCAL"
+                                    provider = user.provider ?: "LOCAL",
+                                    createdAt = user.createdAt
                                 )
                                 user.id?.let { tokenManager.saveUserId(it) }
                             }

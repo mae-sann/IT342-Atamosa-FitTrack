@@ -138,7 +138,8 @@ class RegisterActivity : Activity() {
                                 firstName = user.firstName ?: firstName,
                                 lastName = user.lastName ?: lastName,
                                 role = "ROLE_USER",
-                                provider = user.provider ?: "LOCAL"
+                                provider = user.provider ?: "LOCAL",
+                                createdAt = user.createdAt
                             )
 
                             // Show success message

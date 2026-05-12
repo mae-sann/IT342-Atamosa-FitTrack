@@ -34,8 +34,10 @@ export default function UserLayout() {
     const loadCurrentUser = async () => {
       try {
         const response = await authService.getCurrentUser();
-        setUser(response.data);
-        localStorage.setItem('user', JSON.stringify(response.data));
+        // API returns { data: { user }, success, error }, so extract the actual user object
+        const userData = response.data?.data || response.data;
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(getStoredUser());
       }

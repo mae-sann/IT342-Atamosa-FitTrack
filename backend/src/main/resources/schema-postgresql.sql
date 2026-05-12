@@ -3,6 +3,10 @@ CREATE TABLE IF NOT EXISTS roles (
     name VARCHAR(20) NOT NULL UNIQUE
 );
 
+-- Initialize roles if they don't exist
+INSERT INTO roles (name) VALUES ('ROLE_USER') ON CONFLICT(name) DO NOTHING;
+INSERT INTO roles (name) VALUES ('ROLE_ADMIN') ON CONFLICT(name) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -11,9 +15,9 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(120) NOT NULL UNIQUE,
     password TEXT,
     password_hash TEXT,
-    role VARCHAR(20),
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
     role_id BIGINT REFERENCES roles(id),
-    provider VARCHAR(20),
+    provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL',
     provider_id VARCHAR(255),
     is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -105,6 +109,10 @@ ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
 -- Keep legacy columns nullable so SDD inserts do not violate constraints.
 ALTER TABLE workouts ALTER COLUMN title DROP NOT NULL;
 ALTER TABLE workout_logs ALTER COLUMN exercise_id DROP NOT NULL;
+
+-- Fix any NULL values in role and provider columns (data cleanup)
+UPDATE users SET role = 'USER' WHERE role IS NULL;
+UPDATE users SET provider = 'LOCAL' WHERE provider IS NULL;
 
 -- Keep legacy values synchronized when possible.
 UPDATE workouts

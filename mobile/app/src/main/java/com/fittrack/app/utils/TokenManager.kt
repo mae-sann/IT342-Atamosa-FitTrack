@@ -17,6 +17,7 @@ class TokenManager(context: Context) {
         private const val KEY_LNAME = "user_last_name"
         private const val KEY_ROLE = "user_role"
         private const val KEY_PROVIDER = "user_provider"
+        private const val KEY_CREATED_AT = "user_created_at"
     }
 
     // ── Token ──
@@ -47,7 +48,8 @@ class TokenManager(context: Context) {
         firstName: String?,
         lastName: String?,
         role: String,
-        provider: String
+        provider: String,
+        createdAt: String? = null
     ) {
         prefs.edit()
             .putString(KEY_EMAIL, email ?: "")
@@ -55,6 +57,7 @@ class TokenManager(context: Context) {
             .putString(KEY_LNAME, lastName ?: "")
             .putString(KEY_ROLE, role)
             .putString(KEY_PROVIDER, provider)
+            .putString(KEY_CREATED_AT, createdAt ?: "")
             .apply()
     }
 
@@ -63,6 +66,7 @@ class TokenManager(context: Context) {
     fun getLastName(): String? = prefs.getString(KEY_LNAME, null)
     fun getRole(): String? = prefs.getString(KEY_ROLE, null)
     fun getProvider(): String? = prefs.getString(KEY_PROVIDER, null)
+    fun getCreatedAt(): String? = prefs.getString(KEY_CREATED_AT, null)
 
     fun getFullName(): String {
         val first = getFirstName() ?: ""

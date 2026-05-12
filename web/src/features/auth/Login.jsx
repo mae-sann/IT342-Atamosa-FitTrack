@@ -56,18 +56,40 @@ export default function Login() {
       if (response.data && response.data.token) {
         setAuthToken(response.data.token);
         const backendUser = response.data.user || {};
+        
+        // Check if user just registered and has info in sessionStorage
+        const registeredUser = (() => {
+          try {
+            const stored = sessionStorage.getItem('registeredUser');
+            return stored ? JSON.parse(stored) : null;
+          } catch {
+            return null;
+          }
+        })();
+        
         const normalizedName = (backendUser.name || '').trim();
         const normalizedUser = {
           ...backendUser,
           role: String(backendUser.role || '').toUpperCase(),
-          firstName: backendUser.firstName || normalizedName.split(' ')[0] || '',
+          // Prioritize backend response, fallback to registered user info, then to name parsing
+          firstName: 
+            backendUser.firstName || 
+            registeredUser?.firstName || 
+            normalizedName.split(' ')[0] || 
+            '',
           lastName:
             backendUser.lastName ||
+            registeredUser?.lastName ||
             normalizedName.split(' ').slice(1).join(' ') ||
             backendUser.firstName ||
             '',
         };
+        
         localStorage.setItem('user', JSON.stringify(normalizedUser));
+        
+        // Clear registered user session data after using it
+        sessionStorage.removeItem('registeredUser');
+        
         navigate(getRouteByRole(normalizedUser.role));
       }
     } catch (err) {

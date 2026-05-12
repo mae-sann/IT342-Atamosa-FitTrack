@@ -129,7 +129,6 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupGreeting() {
-        // Debug: Check what's stored
         val firstName = tokenManager.getFirstName()
         val lastName = tokenManager.getLastName()
         val email = tokenManager.getEmail()

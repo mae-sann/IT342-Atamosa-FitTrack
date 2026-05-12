@@ -1,5 +1,6 @@
 package com.fittrack.user;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,17 +33,56 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(@AuthenticationPrincipal FittrackUserDetails userDetails) {
-        return ResponseEntity.ok(userService.getCurrentUser(userDetails.getUsername()));
+    public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal FittrackUserDetails userDetails) {
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User details not found in authentication");
+        }
+
+        String email = userDetails.getUsername();
+        if (email == null || email.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email not available in authentication");
+        }
+
+        UserResponseDTO user = userService.getCurrentUser(email);
+        // Convert LocalDateTime to ISO string for JSON serialization
+        Map<String, Object> userData = new LinkedHashMap<>();
+        userData.put("id", user.id());
+        userData.put("email", user.email());
+        userData.put("firstName", user.firstName());
+        userData.put("lastName", user.lastName());
+        userData.put("role", user.role());
+        userData.put("provider", user.provider());
+        userData.put("createdAt", user.createdAt() != null ? user.createdAt().toString() : null);
+        
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("data", userData);
+        response.put("success", true);
+        response.put("error", null);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserResponseDTO> updateProfile(
+    public ResponseEntity<Map<String, Object>> updateProfile(
             @Valid @RequestBody UpdateProfileRequestDTO request,
             @AuthenticationPrincipal FittrackUserDetails userDetails
     ) {
-        return ResponseEntity.ok(userService.updateProfile(userDetails.getUsername(), request));
+        UserResponseDTO user = userService.updateProfile(userDetails.getUsername(), request);
+        // Convert LocalDateTime to ISO string for JSON serialization
+        Map<String, Object> userData = new LinkedHashMap<>();
+        userData.put("id", user.id());
+        userData.put("email", user.email());
+        userData.put("firstName", user.firstName());
+        userData.put("lastName", user.lastName());
+        userData.put("role", user.role());
+        userData.put("provider", user.provider());
+        userData.put("createdAt", user.createdAt() != null ? user.createdAt().toString() : null);
+        
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("data", userData);
+        response.put("success", true);
+        response.put("error", null);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping

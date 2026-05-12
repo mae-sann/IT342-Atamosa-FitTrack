@@ -58,7 +58,8 @@ export default function ProfilePage() {
       setLoading(true);
       setError('');
       const response = await authService.getCurrentUser();
-      const data = response.data;
+      // API returns { data: { user }, success, error }, so extract the actual user object
+      const data = response.data?.data || response.data;
       setUser(data);
       setFirstName(data?.firstName || '');
       setLastName(data?.lastName || '');
@@ -106,10 +107,12 @@ export default function ProfilePage() {
         first_name: trimmedFirstName,
         last_name: trimmedLastName,
       });
-      setUser(response.data);
-      setFirstName(response.data?.firstName || trimmedFirstName);
-      setLastName(response.data?.lastName || trimmedLastName);
-      localStorage.setItem('user', JSON.stringify(response.data));
+      // API returns { data: { user }, success, error }, so extract the actual user object
+      const userData = response.data?.data || response.data;
+      setUser(userData);
+      setFirstName(userData?.firstName || trimmedFirstName);
+      setLastName(userData?.lastName || trimmedLastName);
+      localStorage.setItem('user', JSON.stringify(userData));
       setEditing(false);
       setSuccessMsg('Profile updated successfully');
     } catch (requestError) {

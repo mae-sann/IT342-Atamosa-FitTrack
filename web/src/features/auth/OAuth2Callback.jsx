@@ -16,16 +16,29 @@ export default function OAuth2Callback() {
     const handleOAuthCallback = async () => {
       const token = searchParams.get('token');
       const provider = searchParams.get('provider');
+      const errorParam = searchParams.get('error');
+      const errorMessage = searchParams.get('message');
+
+      // Check for backend errors
+      if (errorParam === 'authentication_failed') {
+        console.error('Backend OAuth error:', errorMessage);
+        setError(`Backend error: ${errorMessage || 'Unknown error'}`);
+        return;
+      }
 
       if (!token || provider !== 'GOOGLE') {
+        console.error('Missing token or provider. Token:', !!token, 'Provider:', provider);
         setError('Google login failed. Please try again.');
         return;
       }
 
       try {
+        console.log('Setting auth token and fetching user...');
         setAuthToken(token);
 
         const userResponse = await authService.getCurrentUser();
+        console.log('User response:', userResponse);
+
         if (userResponse?.data) {
           const normalizedUser = {
             ...userResponse.data,
@@ -37,10 +50,11 @@ export default function OAuth2Callback() {
         }
 
         navigate('/dashboard', { replace: true });
-      } catch {
+      } catch (err) {
+        console.error('OAuth callback error:', err);
         setAuthToken(null);
         localStorage.removeItem('user');
-        setError('Unable to finish Google sign-in. Please log in again.');
+        setError(`Unable to finish Google sign-in: ${err.message || 'Please log in again.'}`);
       }
     };
 
