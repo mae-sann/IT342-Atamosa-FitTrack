@@ -84,7 +84,8 @@ export default function Exercises() {
 				apiClient.get('/api/exercises'),
 			]);
 
-			setUser(userResponse.data);
+			const userData = userResponse.data?.data || userResponse.data;
+			setUser(userData);
 
 			const payload = exercisesResponse.data;
 			const exerciseItems = Array.isArray(payload)

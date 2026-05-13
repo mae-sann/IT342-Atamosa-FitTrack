@@ -76,7 +76,8 @@ export default function AdminDashboard() {
 
   const loadCurrentUser = async () => {
     const response = await authService.getCurrentUser();
-    setCurrentUser(response.data);
+    const userData = response.data?.data || response.data;
+    setCurrentUser(userData);
   };
 
   useEffect(() => {

@@ -8,7 +8,8 @@ import SidebarLogoutButton from '../components/sidebar/SidebarLogoutButton';
 
 function getStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem('user') || 'null');
+    const parsed = JSON.parse(localStorage.getItem('user') || 'null');
+    return parsed?.data && typeof parsed.data === 'object' ? parsed.data : parsed;
   } catch {
     return null;
   }

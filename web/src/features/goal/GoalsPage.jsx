@@ -73,7 +73,8 @@ export default function GoalsPage() {
   async function loadCurrentUser() {
     try {
       const response = await authService.getCurrentUser();
-      setUser(response.data);
+      const userData = response.data?.data || response.data;
+      setUser(userData);
     } catch (error) {
       console.error('Failed to load current user:', error);
     }

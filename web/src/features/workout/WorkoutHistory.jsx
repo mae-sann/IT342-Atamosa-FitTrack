@@ -152,7 +152,8 @@ export default function WorkoutHistory() {
         api.get('/api/workouts'),
       ]);
 
-      setUser(userResponse.data);
+      const userData = userResponse.data?.data || userResponse.data;
+      setUser(userData);
       const items = Array.isArray(workoutsResponse.data) 
         ? workoutsResponse.data 
         : Array.isArray(workoutsResponse.data?.items) 

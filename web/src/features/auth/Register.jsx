@@ -28,9 +28,10 @@ export default function Register() {
       if (isAuthenticated()) {
         try {
           const userResponse = await authService.getCurrentUser();
-          if (userResponse?.data) {
-            localStorage.setItem('user', JSON.stringify(userResponse.data));
-            navigate(getRouteByRole(userResponse.data.role));
+          const userData = userResponse?.data?.data || userResponse?.data;
+          if (userData) {
+            localStorage.setItem('user', JSON.stringify(userData));
+            navigate(getRouteByRole(userData.role));
             return;
           }
           navigate('/dashboard');

@@ -39,10 +39,11 @@ export default function OAuth2Callback() {
         const userResponse = await authService.getCurrentUser();
         console.log('User response:', userResponse);
 
-        if (userResponse?.data) {
+        const userData = userResponse?.data?.data || userResponse?.data;
+        if (userData) {
           const normalizedUser = {
-            ...userResponse.data,
-            role: String(userResponse.data.role || '').toUpperCase(),
+            ...userData,
+            role: String(userData.role || '').toUpperCase(),
           };
           localStorage.setItem('user', JSON.stringify(normalizedUser));
           navigate(getRouteByRole(normalizedUser.role), { replace: true });
