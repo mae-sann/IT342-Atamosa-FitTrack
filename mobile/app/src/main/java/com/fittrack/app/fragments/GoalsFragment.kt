@@ -15,6 +15,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import com.fittrack.app.R
+import com.fittrack.app.utils.DialogHelper
 import com.fittrack.app.models.CreateGoalRequest
 import com.fittrack.app.models.GoalResponse
 import com.fittrack.app.models.GoalStatus
@@ -165,11 +166,21 @@ class GoalsFragment : Fragment() {
         val etGoalText    = dialogView.findViewById<EditText>(R.id.etGoalText)
         val etCurrentVal  = dialogView.findViewById<EditText>(R.id.etCurrentValue)
         val etTargetVal   = dialogView.findViewById<EditText>(R.id.etTargetValue)
+        val btnCancel     = dialogView.findViewById<Button>(R.id.btnCancelAddGoal)
+        val btnSave       = dialogView.findViewById<Button>(R.id.btnSaveAddGoal)
 
-        AlertDialog.Builder(activity)
-            .setTitle("Add New Goal")
+        val dialog = AlertDialog.Builder(activity)
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
+            .setCancelable(true)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnSave.setOnClickListener {
                 val text    = etGoalText.text.toString().trim()
                 val current = etCurrentVal.text.toString().toFloatOrNull() ?: 0f
                 val target  = etTargetVal.text.toString().toFloatOrNull()
@@ -179,11 +190,14 @@ class GoalsFragment : Fragment() {
                         Toast.makeText(activity, "Please enter a goal description", Toast.LENGTH_SHORT).show()
                     target == null || target <= 0 ->
                         Toast.makeText(activity, "Please enter a valid target value", Toast.LENGTH_SHORT).show()
-                    else -> saveGoal(text, current, target)
+                    else -> {
+                        dialog.dismiss()
+                        saveGoal(text, current, target)
+                    }
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+
+        dialog.show()
     }
 
     private fun saveGoal(text: String, current: Float, target: Float) {
@@ -229,19 +243,29 @@ class GoalsFragment : Fragment() {
         tvTarget.text   = "Target: ${goal.targetValue.toInt()}"
         etNewCurrent.setText(goal.currentValue.toInt().toString())
 
-        AlertDialog.Builder(activity)
-            .setTitle("Update Progress")
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancelUpdateGoal)
+        val btnSave   = dialogView.findViewById<Button>(R.id.btnSaveUpdateGoal)
+
+        val dialog = AlertDialog.Builder(activity)
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
-                val newVal = etNewCurrent.text.toString().toFloatOrNull()
-                if (newVal == null) {
-                    Toast.makeText(activity, "Enter a valid value", Toast.LENGTH_SHORT).show()
-                } else {
-                    updateGoal(goal.id, newVal)
-                }
+            .setCancelable(true)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+
+        btnSave.setOnClickListener {
+            val newVal = etNewCurrent.text.toString().toFloatOrNull()
+            if (newVal == null) {
+                Toast.makeText(activity, "Enter a valid value", Toast.LENGTH_SHORT).show()
+            } else {
+                dialog.dismiss()
+                updateGoal(goal.id, newVal)
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+
+        dialog.show()
     }
 
     private fun updateGoal(goalId: Long, newValue: Float) {
@@ -271,12 +295,10 @@ class GoalsFragment : Fragment() {
 
     // ── DELETE GOAL ────────────────────────────────────────
     private fun confirmDeleteGoal(goalId: Long) {
-        AlertDialog.Builder(activity)
-            .setTitle("Delete Goal")
-            .setMessage("Are you sure? This cannot be undone.")
-            .setPositiveButton("Delete") { _, _ -> deleteGoal(goalId) }
-            .setNegativeButton("Cancel", null)
-            .show()
+        DialogHelper.showDeleteGoalDialog(
+            context = activity,
+            onConfirm = { deleteGoal(goalId) }
+        )
     }
 
     private fun deleteGoal(goalId: Long) {

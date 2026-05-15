@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.app.AlertDialog
+import com.fittrack.app.utils.DialogHelper
 
 class DashboardFragment : Fragment() {
 
@@ -296,16 +296,17 @@ class DashboardFragment : Fragment() {
                 startActivity(intent)
             }
 
-// Delete button — confirm then delete
+            // Delete button — show themed confirmation dialog
             itemView.findViewById<Button>(R.id.btnDeleteWorkout).setOnClickListener {
-                android.app.AlertDialog.Builder(activity)
-                    .setTitle("Delete Workout")
-                    .setMessage("Are you sure you want to delete this workout?")
-                    .setPositiveButton("Delete") { _, _ ->
-                        deleteWorkoutFromDashboard(workout.id)
-                    }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+                val date = formatWorkoutDate(workout.workoutDate)
+                val count = workout.logs?.size ?: 0
+
+                DialogHelper.showDeleteWorkoutDialog(
+                    context = activity,
+                    workoutDate = date,
+                    exerciseCount = count,
+                    onConfirm = { deleteWorkoutFromDashboard(workout.id) }
+                )
             }
             layoutRecentWorkouts.addView(itemView)
         }
@@ -422,8 +423,35 @@ class DashboardFragment : Fragment() {
                 GoalStatus.DONE          -> "✓ Done"
             }
 
+            when (status) {
+                GoalStatus.JUST_STARTED -> {
+                    tvStatus.setBackgroundResource(R.drawable.bg_badge_gray)
+                    tvStatus.setTextColor(resources.getColor(R.color.colorGeneralText))
+                }
+                GoalStatus.IN_PROGRESS -> {
+                    tvStatus.setBackgroundResource(R.drawable.bg_badge_blue)
+                    tvStatus.setTextColor(resources.getColor(R.color.colorUpperBodyText))
+                }
+                GoalStatus.ALMOST_THERE -> {
+                    tvStatus.setBackgroundResource(R.drawable.bg_badge_green)
+                    tvStatus.setTextColor(resources.getColor(R.color.colorLowerBodyText))
+                }
+                GoalStatus.DONE -> {
+                    tvStatus.setBackgroundResource(R.drawable.bg_badge_purple)
+                    tvStatus.setTextColor(resources.getColor(R.color.colorCoreText))
+                }
+            }
+
             // Progress bar width
             val progressView = itemView.findViewById<View>(R.id.viewGoalProgress)
+            progressView.setBackgroundResource(
+                when (status) {
+                    GoalStatus.JUST_STARTED -> R.drawable.bg_progress_fill_blue
+                    GoalStatus.IN_PROGRESS -> R.drawable.bg_progress_fill_blue
+                    GoalStatus.ALMOST_THERE -> R.drawable.bg_progress_fill_green
+                    GoalStatus.DONE -> R.drawable.bg_progress_fill_purple
+                }
+            )
             progressView.post {
                 val parent = progressView.parent as? View
                 val maxWidth = parent?.width ?: 0

@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.fittrack.app.R
 import com.fittrack.app.activities.MainActivity
+import com.fittrack.app.utils.DialogHelper
 import com.fittrack.app.models.UpdateProfileRequest
 import com.fittrack.app.network.RetrofitClient
 import com.fittrack.app.utils.TokenManager
@@ -327,12 +328,9 @@ class ProfileFragment : Fragment() {
     // ── LOGOUT ─────────────────────────────────────────────
     private fun confirmLogout() {
         AlertDialog.Builder(activity)
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Logout") { _, _ ->
-                (activity as? MainActivity)?.logout()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        DialogHelper.showLogoutDialog(
+            context = activity,
+            onConfirm = { (activity as? MainActivity)?.logout() }
+        )
     }
 }

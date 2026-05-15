@@ -8,51 +8,26 @@
     android:padding="20dp">
 
     <TextView
-        android:id="@+id/tvUpdateGoalName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Goal Name"
+        android:text="Logout"
         android:textColor="@color/colorTextPrimary"
-        android:textSize="15sp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="12dp"/>
 
     <TextView
-        android:id="@+id/tvUpdateTarget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Target: 100"
-        android:textColor="@color/colorTextSecondary"
-        android:textSize="13sp"
-        android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Current Value"
-        android:textColor="@color/colorTextPrimary"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="6dp"/>
-
-    <EditText
-        android:id="@+id/etNewCurrentValue"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="Enter new value"
+        android:layout_height="wrap_content"
+        android:text="Are you sure you want to logout?"
+        android:textColor="@color/colorTextSecondary"
         android:textSize="14sp"
-        android:paddingStart="16dp"
-        android:inputType="numberDecimal"
-        android:singleLine="true"
-        android:background="@drawable/bg_input_field"
-        android:textColor="@color/colorTextPrimary"
-        android:textColorHint="@color/colorTextMuted"/>
+        android:layout_marginBottom="16dp"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/colorDivider"
-        android:layout_marginTop="16dp"
         android:layout_marginBottom="12dp"/>
 
     <LinearLayout
@@ -62,31 +37,33 @@
         android:gravity="end">
 
         <Button
-            android:id="@+id/btnCancelUpdateGoal"
+            android:id="@+id/btnCancelLogout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="@drawable/bg_button_secondary"
             android:text="@string/btn_cancel"
             android:textAllCaps="true"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorTextSecondary"
             android:textStyle="bold"
             android:stateListAnimator="@null"
             android:minWidth="0dp"
             android:paddingStart="12dp"
-            android:paddingEnd="12dp"/>
+            android:paddingEnd="12dp"
+            android:layout_marginEnd="10dp"/>
 
         <Button
-            android:id="@+id/btnSaveUpdateGoal"
+            android:id="@+id/btnConfirmLogout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:text="@string/btn_save"
+            android:background="@drawable/bg_button_danger"
+            android:text="Logout"
             android:textAllCaps="true"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorError"
             android:textStyle="bold"
             android:stateListAnimator="@null"
             android:minWidth="0dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"/>
     </LinearLayout>
+
 </LinearLayout>

@@ -8,6 +8,15 @@
     android:padding="20dp">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_new_goal_title"
+        android:textColor="@color/colorTextPrimary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="14dp"/>
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="What is your goal?"
@@ -20,18 +29,20 @@
         android:id="@+id/etGoalText"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:hint="e.g., Bench Press 80 kg"
+        android:hint="e.g., Bench Press"
         android:textSize="14sp"
+        android:paddingStart="16dp"
         android:singleLine="true"
         android:background="@drawable/bg_input_field"
         android:textColor="@color/colorTextPrimary"
         android:textColorHint="@color/colorTextMuted"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginBottom="18dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -54,6 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:hint="0"
+                android:paddingStart="16dp"
                 android:textSize="14sp"
                 android:inputType="numberDecimal"
                 android:singleLine="true"
@@ -83,6 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:hint="100"
+                android:paddingStart="16dp"
                 android:textSize="14sp"
                 android:inputType="numberDecimal"
                 android:singleLine="true"
@@ -90,6 +103,47 @@
                 android:textColor="@color/colorTextPrimary"
                 android:textColorHint="@color/colorTextMuted"/>
         </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btnCancelAddGoal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="@string/btn_cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"
+            android:stateListAnimator="@null"
+            android:minWidth="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"/>
+
+        <Button
+            android:id="@+id/btnSaveAddGoal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="@string/btn_save"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"
+            android:stateListAnimator="@null"
+            android:minWidth="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"/>
     </LinearLayout>
 
 </LinearLayout>

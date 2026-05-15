@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Header row: Title + X button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="14dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Delete Workout"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnCloseDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_button_danger"
+            android:text="✕"
+            android:textColor="@color/colorError"
+            android:textSize="14sp"
+            android:padding="0dp"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+    <!-- Red warning banner -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_button_danger"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚠️  "
+            android:textSize="14sp"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This action cannot be undone."
+            android:textColor="@color/colorError"
+            android:textSize="13sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Workout Date row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Date"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tvDeleteWorkoutDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workout_date_placeholder"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Exercise count row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Exercises"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tvDeleteExerciseCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3 exercises"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Cancel + Delete buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCancelDelete"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:text="Cancel"
+            android:textColor="@color/colorTextSecondary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:stateListAnimator="@null"
+            android:layout_marginEnd="10dp"/>
+
+        <Button
+            android:id="@+id/btnConfirmDelete"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_danger"
+            android:text="Delete Workout"
+            android:textColor="@color/colorError"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:stateListAnimator="@null"/>
+    </LinearLayout>
+
+</LinearLayout>

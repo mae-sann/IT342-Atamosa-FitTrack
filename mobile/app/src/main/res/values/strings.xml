@@ -36,6 +36,7 @@
     <string name="workout_history">Workout History</string>
     <string name="create_workout">Create New Workout</string>
     <string name="workout_date">Workout Date</string>
+    <string name="workout_date_placeholder">--</string>
     <string name="add_exercise">Add Exercise</string>
     <string name="save_workout">Save Workout</string>
     <string name="exercises_in_workout">Exercises in This Workout</string>
@@ -57,6 +58,7 @@
 
     <!-- Goals -->
     <string name="fitness_goals">Fitness Goals</string>
+    <string name="add_new_goal_title">Add New Goal</string>
     <string name="add_goal">+ Add Goal</string>
     <string name="goal_description">What is your goal?</string>
     <string name="goal_hint">e.g., Bench Press 80 kg, Run 5 km…</string>

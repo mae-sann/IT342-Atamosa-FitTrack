@@ -1,6 +1,5 @@
 package com.fittrack.app.fragments
 
-import android.app.AlertDialog
 import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
@@ -29,6 +28,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.fittrack.app.utils.DialogHelper
 
 class WorkoutHistoryFragment : Fragment() {
 
@@ -218,14 +218,17 @@ class WorkoutHistoryFragment : Fragment() {
     }
 
     private fun confirmDelete(workoutId: Long, itemView: View) {
-        AlertDialog.Builder(activity)
-            .setTitle("Delete Workout")
-            .setMessage("Are you sure you want to delete this workout?")
-            .setPositiveButton("Delete") { _, _ ->
-                deleteWorkout(workoutId, itemView)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        // Find the workout to get its details for the dialog
+        val workout = allWorkouts.find { it.id == workoutId }
+        val date    = formatDate(workout?.workoutDate)
+        val count   = workout?.logs?.size ?: 0
+
+        DialogHelper.showDeleteWorkoutDialog(
+            context       = activity,
+            workoutDate   = date,
+            exerciseCount = count,
+            onConfirm     = { deleteWorkout(workoutId, itemView) }
+        )
     }
 
     private fun deleteWorkout(workoutId: Long, itemView: View) {
