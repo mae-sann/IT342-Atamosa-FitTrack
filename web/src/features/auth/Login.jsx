@@ -9,7 +9,7 @@ const getRouteByRole = (role) => {
 };
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', rememberMe: false });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,11 @@ export default function Login() {
   }, [searchParams, navigate]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -55,7 +59,7 @@ export default function Login() {
       setLoading(true);
       const response = await authService.login(formData.email, formData.password);
       if (response.data && response.data.token) {
-        setAuthToken(response.data.token);
+        setAuthToken(response.data.token, formData.rememberMe);
         const backendUser = response.data.user || {};
         
         // Check if user just registered and has info in sessionStorage
@@ -180,8 +184,18 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Forgot password */}
-            <div className="flex justify-end mb-6">
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between mb-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded border-gray-400 text-blue-500 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-300">Remember me</span>
+              </label>
               <a href="#" className="text-sm text-blue-400 hover:text-blue-300 transition">Forgot password?</a>
             </div>
 

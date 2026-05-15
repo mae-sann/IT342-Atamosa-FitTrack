@@ -9,10 +9,14 @@ const getStoredUser = () => {
   }
 };
 
+const getStoredToken = () => {
+  return sessionStorage.getItem('jwt_token') || localStorage.getItem('jwt_token');
+};
+
 const AuthContext = createContext({
   user: getStoredUser(),
   setUser: () => {},
-  isAuthenticated: Boolean(localStorage.getItem('jwt_token')),
+  isAuthenticated: Boolean(getStoredToken()),
 });
 
 export function AuthProvider({ children }) {
@@ -28,7 +32,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       setUser,
-      isAuthenticated: Boolean(localStorage.getItem('jwt_token')),
+      isAuthenticated: Boolean(getStoredToken()),
     }),
     [user]
   );

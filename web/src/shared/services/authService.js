@@ -6,10 +6,15 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Helper to get token from either storage.
+const getStoredToken = () => {
+  return sessionStorage.getItem('jwt_token') || localStorage.getItem('jwt_token');
+};
+
 // Add JWT token to requests if available
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('jwt_token');
+    const token = getStoredToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,8 +35,10 @@ export const authService = {
 
   logout: () => {
     localStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('jwt_token');
     localStorage.removeItem('user');
     localStorage.removeItem('selected_workout_exercises');
+    delete apiClient.defaults.headers.common['Authorization'];
     return Promise.resolve();
   },
 
@@ -85,18 +92,31 @@ export const authService = {
   },
 };
 
-export const setAuthToken = (token) => {
+export const setAuthToken = (token, rememberMe = false) => {
   if (token) {
-    localStorage.setItem('jwt_token', token);
+    localStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('jwt_token');
+
+    if (rememberMe) {
+      localStorage.setItem('jwt_token', token);
+    } else {
+      sessionStorage.setItem('jwt_token', token);
+    }
+
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   } else {
     localStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('jwt_token');
     delete apiClient.defaults.headers.common['Authorization'];
   }
 };
 
-export const getAuthToken = () => localStorage.getItem('jwt_token');
+export const getAuthToken = () => {
+  return sessionStorage.getItem('jwt_token') || localStorage.getItem('jwt_token');
+};
 
-export const isAuthenticated = () => !!localStorage.getItem('jwt_token');
+export const isAuthenticated = () => {
+  return !!(sessionStorage.getItem('jwt_token') || localStorage.getItem('jwt_token'));
+};
 
 export default apiClient;
