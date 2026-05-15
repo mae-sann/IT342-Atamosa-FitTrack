@@ -26,6 +26,11 @@ export default function Landing() {
 					70%  { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
 					100% { box-shadow: 0 0 0 0   rgba(37,99,235,0); }
 				}
+				@keyframes bounce {
+					0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+					40% { transform: translateX(-50%) translateY(-10px); }
+					60% { transform: translateX(-50%) translateY(-5px); }
+				}
 				.stat-num {
 					font-family: 'Bebas Neue', cursive !important;
 					font-size: 3.5rem;
@@ -171,9 +176,9 @@ export default function Landing() {
 						</div>
 					</div>
 				</div>
-				<div style={{position:'absolute',bottom:'2rem',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.5rem',animation:'bounce 1s infinite'}}>
-					<span style={{fontSize:'0.75rem',color:'#6b7280'}}>Scroll down</span>
-					<svg style={{width:'1rem',height:'1rem',color:'#6b7280'}} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
+				<div style={{position:'absolute',bottom:'2rem',left:'50%',transform:'translateX(-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:'0.5rem',animation:'bounce 1.6s infinite ease-in-out'}}>
+					<span style={{fontSize:'0.75rem',color:'#94a3b8',letterSpacing:'0.08em',textTransform:'uppercase'}}>Scroll down</span>
+					<svg style={{width:'1rem',height:'1rem',color:'#94a3b8'}} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
 				</div>
 			</section>
 
