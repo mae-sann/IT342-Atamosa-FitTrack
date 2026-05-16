@@ -291,6 +291,7 @@ export default function Dashboard() {
   if (!workouts) return <div className="db-loading-screen">Loading…</div>;
 
   const totalWorkouts    = workouts.length;
+  const totalExercises   = workouts.reduce((sum, workout) => sum + (workout?.logs?.length || 0), 0);
   const workoutsThisWeek = getWorkoutsThisWeek(workouts);
   const activeDayStreak  = calculateStreak(workouts);
   const weeklyProgress   = Math.min(100, Math.round((workoutsThisWeek.length / WEEKLY_WORKOUT_GOAL) * 100));
@@ -359,7 +360,7 @@ export default function Dashboard() {
                 <span className="stat-badge stat-badge--green">+{workoutsThisWeek.length} this week</span>
               </div>
               <div className="stat-value">{totalWorkouts}</div>
-              <div className="stat-label">Workouts Completed</div>
+              <div className="stat-label">Total Workouts</div>
               <div className="progress-bar" style={{ marginTop: '0.75rem' }}>
                 <div className="progress-fill" style={{ width: `${weeklyProgress}%` }} />
               </div>
@@ -376,7 +377,7 @@ export default function Dashboard() {
                 <span className="stat-badge stat-badge--orange">🔥 Streak!</span>
               </div>
               <div className="stat-value">{activeDayStreak}</div>
-              <div className="stat-label">Active Days Streak</div>
+              <div className="stat-label">Day Streak</div>
               <div className="progress-bar" style={{ marginTop: '0.75rem' }}>
                 <div className="progress-fill" style={{ width: `${Math.min(100, activeDayStreak * 10)}%`, background: '#f97316' }} />
               </div>
@@ -392,9 +393,25 @@ export default function Dashboard() {
                 <span className="stat-badge stat-badge--emerald">{activeGoals} active</span>
               </div>
               <div className="stat-value">{achievedGoals}/{goals.length}</div>
-              <div className="stat-label">Goals Achieved</div>
+              <div className="stat-label">Active Goals</div>
               <div className="progress-bar" style={{ marginTop: '0.75rem' }}>
                 <div className="progress-fill" style={{ width: `${goals.length ? Math.round((achievedGoals / goals.length) * 100) : 0}%`, background: '#10b981' }} />
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-card-top">
+                <div className="stat-icon stat-icon--purple">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 7h12m-12 5h12m-12 5h8M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z" />
+                  </svg>
+                </div>
+                <span className="stat-badge stat-badge--purple">All logs</span>
+              </div>
+              <div className="stat-value">{totalExercises}</div>
+              <div className="stat-label">Exercises Logged</div>
+              <div className="progress-bar" style={{ marginTop: '0.75rem' }}>
+                <div className="progress-fill" style={{ width: `${Math.min(100, totalExercises * 4)}%`, background: '#8b5cf6' }} />
               </div>
             </div>
           </div>
