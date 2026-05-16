@@ -43,12 +43,14 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@drawable/bg_button_primary"
-            android:text="💾 Save"
+            android:text="Save"
+            android:drawableStart="@drawable/ic_save"
+            android:drawablePadding="8dp"
             android:textColor="@color/colorWhite"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:stateListAnimator="@null"/>
     </LinearLayout>
 
@@ -72,15 +74,30 @@
                 android:padding="16dp"
                 android:layout_marginBottom="16dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📅  Session Details"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.08"
-                    android:layout_marginBottom="14dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_calendar"
+                        android:tint="@color/colorPrimary"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Session Details"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"/>
+
+                </LinearLayout>
 
                 <!-- Workout Name Field - NEW -->
                 <TextView
@@ -138,15 +155,30 @@
                 android:padding="16dp"
                 android:layout_marginBottom="16dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🏋️  Add Exercise"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.08"
-                    android:layout_marginBottom="14dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_stat_exercises"
+                        android:tint="@color/colorPrimary"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add Exercise"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"/>
+
+                </LinearLayout>
 
                 <!-- Browse exercise button -->
                 <Button
@@ -316,11 +348,11 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🏋️"
-                        android:textSize="28sp"/>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_add_circle"
+                        android:tint="@color/colorTextMuted"/>
 
                     <TextView
                         android:layout_width="wrap_content"

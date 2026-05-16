@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ImageView
 import com.fittrack.app.R
 import com.fittrack.app.fragments.DashboardFragment
 import com.fittrack.app.fragments.GoalsFragment
@@ -28,6 +29,12 @@ class MainActivity : Activity() {
     private lateinit var labelWorkouts: TextView
     private lateinit var labelGoals: TextView
     private lateinit var labelProfile: TextView
+
+    // Tab icons
+    private lateinit var iconDashboard: ImageView
+    private lateinit var iconWorkouts: ImageView
+    private lateinit var iconGoals: ImageView
+    private lateinit var iconProfile: ImageView
 
     // Track which tab is active
     private var activeTab = 0
@@ -55,6 +62,11 @@ class MainActivity : Activity() {
         labelWorkouts  = findViewById(R.id.labelWorkouts)
         labelGoals     = findViewById(R.id.labelGoals)
         labelProfile   = findViewById(R.id.labelProfile)
+
+        iconDashboard = findViewById(R.id.iconDashboard)
+        iconWorkouts  = findViewById(R.id.iconWorkouts)
+        iconGoals     = findViewById(R.id.iconGoals)
+        iconProfile   = findViewById(R.id.iconProfile)
 
         // Tab click listeners
         tabDashboard.setOnClickListener { switchTab(0) }
@@ -90,6 +102,12 @@ class MainActivity : Activity() {
         labelWorkouts.setTextColor(if  (index == 1) active else inactive)
         labelGoals.setTextColor(if     (index == 2) active else inactive)
         labelProfile.setTextColor(if   (index == 3) active else inactive)
+
+        // Update icon tints
+        iconDashboard.setColorFilter(if (index == 0) active else inactive)
+        iconWorkouts.setColorFilter(if (index == 1) active else inactive)
+        iconGoals.setColorFilter(if (index == 2) active else inactive)
+        iconProfile.setColorFilter(if (index == 3) active else inactive)
     }
 
     // Called from fragments to navigate to Create Workout

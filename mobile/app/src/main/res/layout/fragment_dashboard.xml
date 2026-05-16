@@ -65,6 +65,7 @@
             android:layout_height="wrap_content"
             android:columnCount="2"
             android:rowCount="2"
+            android:useDefaultMargins="false"
             android:layout_marginBottom="24dp">
 
             <!-- Card 1: Total Workouts (blue) -->
@@ -73,41 +74,52 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="4dp"
+                android:layout_margin="6dp"
                 android:background="@drawable/bg_card_blue"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:minHeight="156dp"
+                android:elevation="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💪"
-                    android:textSize="22sp"/>
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_stat_icon_chip"
+                    android:backgroundTint="#1A2563EB">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_stat_workouts"
+                        android:tint="@color/colorPrimary"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvTotalWorkouts"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="0"
                     android:textColor="@color/colorTextPrimary"
-                    android:textSize="28sp"
+                    android:textSize="38sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="6dp"
                     android:text="Total Workouts"
                     android:textColor="@color/colorTextSecondary"
                     android:textSize="11sp"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.06"/>
 
                 <TextView
                     android:id="@+id/tvWorkoutsSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="10dp"
                     android:text="this week"
                     android:textColor="@color/colorPrimary"
                     android:textSize="11sp"
@@ -120,41 +132,52 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="4dp"
+                android:layout_margin="6dp"
                 android:background="@drawable/bg_card_orange"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:minHeight="156dp"
+                android:elevation="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🔥"
-                    android:textSize="22sp"/>
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_stat_icon_chip"
+                    android:backgroundTint="#1AF97316">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_stat_streak"
+                        android:tint="@color/colorWarning"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvDayStreak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="0"
                     android:textColor="@color/colorTextPrimary"
-                    android:textSize="28sp"
+                    android:textSize="38sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="6dp"
                     android:text="Day Streak"
                     android:textColor="@color/colorTextSecondary"
                     android:textSize="11sp"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.06"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="🔥 Keep going!"
+                    android:layout_marginTop="10dp"
+                    android:text="Keep going!"
                     android:textColor="@color/colorWarning"
                     android:textSize="11sp"
                     android:textStyle="bold"/>
@@ -166,41 +189,52 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="4dp"
+                android:layout_margin="6dp"
                 android:background="@drawable/bg_card_green"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:minHeight="156dp"
+                android:elevation="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🎯"
-                    android:textSize="22sp"/>
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_stat_icon_chip"
+                    android:backgroundTint="#1A10B981">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_stat_goals"
+                        android:tint="@color/colorSuccess"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvActiveGoals"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="0"
                     android:textColor="@color/colorTextPrimary"
-                    android:textSize="28sp"
+                    android:textSize="38sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="6dp"
                     android:text="Active Goals"
                     android:textColor="@color/colorTextSecondary"
                     android:textSize="11sp"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.06"/>
 
                 <TextView
                     android:id="@+id/tvGoalsSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="10dp"
                     android:text="in progress"
                     android:textColor="@color/colorSuccess"
                     android:textSize="11sp"
@@ -213,40 +247,51 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="4dp"
+                android:layout_margin="6dp"
                 android:background="@drawable/bg_card_purple"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:minHeight="156dp"
+                android:elevation="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📋"
-                    android:textSize="22sp"/>
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_stat_icon_chip"
+                    android:backgroundTint="#1A8B5CF6">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_stat_exercises"
+                        android:tint="@color/colorStatPurple"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvExercisesLogged"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="0"
                     android:textColor="@color/colorTextPrimary"
-                    android:textSize="28sp"
+                    android:textSize="38sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="6dp"
                     android:text="Exercises Logged"
                     android:textColor="@color/colorTextSecondary"
                     android:textSize="11sp"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.06"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="10dp"
                     android:text="total logged"
                     android:textColor="@color/colorPurple"
                     android:textSize="11sp"

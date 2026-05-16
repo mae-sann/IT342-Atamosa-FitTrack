@@ -38,12 +38,12 @@
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
+            <ImageView
                 android:id="@+id/iconDashboard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏠"
-                android:textSize="20sp"/>
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_home"
+                android:tint="@color/colorPrimary"/>
 
             <TextView
                 android:id="@+id/labelDashboard"
@@ -67,12 +67,12 @@
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
+            <ImageView
                 android:id="@+id/iconWorkouts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📋"
-                android:textSize="20sp"/>
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_workouts"
+                android:tint="@color/colorTextMuted"/>
 
             <TextView
                 android:id="@+id/labelWorkouts"
@@ -95,12 +95,12 @@
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
+            <ImageView
                 android:id="@+id/iconGoals"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎯"
-                android:textSize="20sp"/>
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_goals"
+                android:tint="@color/colorTextMuted"/>
 
             <TextView
                 android:id="@+id/labelGoals"
@@ -123,12 +123,12 @@
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
+            <ImageView
                 android:id="@+id/iconProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="👤"
-                android:textSize="20sp"/>
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_profile"
+                android:tint="@color/colorTextMuted"/>
 
             <TextView
                 android:id="@+id/labelProfile"
