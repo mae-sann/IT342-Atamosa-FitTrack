@@ -86,7 +86,7 @@ class CreateWorkoutActivity : Activity() {
 
         // Update title and save button for edit mode
         if (isEditMode) {
-            btnSaveWorkout.text = "💾 Update"
+            btnSaveWorkout.text = "Update"
             loadExistingWorkout(editWorkoutId)
         }
 
@@ -166,7 +166,7 @@ class CreateWorkoutActivity : Activity() {
                         }
 
                         btnSaveWorkout.isEnabled = true
-                        btnSaveWorkout.text      = "💾 Update"
+                        btnSaveWorkout.text      = "Update"
 
                     } else {
                         Toast.makeText(
@@ -175,7 +175,7 @@ class CreateWorkoutActivity : Activity() {
                             Toast.LENGTH_SHORT
                         ).show()
                         btnSaveWorkout.isEnabled = true
-                        btnSaveWorkout.text      = "💾 Update"
+                        btnSaveWorkout.text      = "Update"
                     }
                 }
             } catch (e: Exception) {
@@ -186,7 +186,7 @@ class CreateWorkoutActivity : Activity() {
                         Toast.LENGTH_SHORT
                     ).show()
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text      = "💾 Update"
+                    btnSaveWorkout.text      = "Update"
                 }
             }
         }
@@ -323,7 +323,7 @@ class CreateWorkoutActivity : Activity() {
 
                 withContext(Dispatchers.Main) {
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text      = "💾 Save"
+                    btnSaveWorkout.text      = "Save"
 
                     if (response.isSuccessful) {
                         Toast.makeText(
@@ -343,7 +343,7 @@ class CreateWorkoutActivity : Activity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text      = "💾 Save"
+                    btnSaveWorkout.text      = "Save"
                     Toast.makeText(
                         this@CreateWorkoutActivity,
                         "Error: ${e.message}",
@@ -377,7 +377,7 @@ class CreateWorkoutActivity : Activity() {
 
                 withContext(Dispatchers.Main) {
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text      = "💾 Update"
+                    btnSaveWorkout.text      = "Update"
 
                     if (response.isSuccessful) {
                         Toast.makeText(
@@ -397,7 +397,7 @@ class CreateWorkoutActivity : Activity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     btnSaveWorkout.isEnabled = true
-                    btnSaveWorkout.text      = "💾 Update"
+                    btnSaveWorkout.text      = "Update"
                     Toast.makeText(
                         this@CreateWorkoutActivity,
                         "Error: ${e.message}",
