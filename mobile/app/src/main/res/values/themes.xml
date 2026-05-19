@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Base app theme — dark throughout -->
-    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorPrimaryDark">@color/colorBackground</item>
         <item name="android:colorAccent">@color/colorPrimary</item>

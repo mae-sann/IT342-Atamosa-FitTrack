@@ -3,6 +3,8 @@ package com.fittrack.app.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.PasswordTransformationMethod
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import com.fittrack.app.R
@@ -47,6 +49,10 @@ class RegisterActivity : Activity() {
         tvError = findViewById(R.id.tvError)
         progressBar = findViewById(R.id.progressBar)
 
+        // Setup password toggles
+        setupPasswordToggle(etPassword)
+        setupPasswordToggle(etConfirmPassword)
+
         // Register button
         btnRegister.setOnClickListener {
             val firstName = etFirstName.text.toString().trim()
@@ -79,6 +85,35 @@ class RegisterActivity : Activity() {
 
         // Go back to Login
         tvLoginLink.setOnClickListener { finish() }
+    }
+
+    private fun setupPasswordToggle(editText: EditText) {
+        editText.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = editText.compoundDrawablesRelative[2] // Right drawable
+                if (drawableEnd != null && event.rawX >= (editText.right - drawableEnd.bounds.width())) {
+                    togglePasswordVisibility(editText)
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+    }
+
+    private fun togglePasswordVisibility(editText: EditText) {
+        val selection = editText.selectionEnd
+        val isPasswordVisible = editText.transformationMethod == null
+
+        if (isPasswordVisible) {
+            // Hide password
+            editText.transformationMethod = PasswordTransformationMethod.getInstance()
+            editText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_eye_off, 0)
+        } else {
+            // Show password
+            editText.transformationMethod = null
+            editText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_eye, 0)
+        }
+        editText.setSelection(selection)
     }
 
     private fun performRegister(

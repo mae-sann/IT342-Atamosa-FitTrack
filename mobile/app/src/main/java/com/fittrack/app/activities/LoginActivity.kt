@@ -3,6 +3,8 @@ package com.fittrack.app.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.PasswordTransformationMethod
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -50,6 +52,9 @@ class LoginActivity : Activity() {
         tvError = findViewById(R.id.tvError)
         progressBar = findViewById(R.id.progressBar)
 
+        // Setup password toggle
+        setupPasswordToggle(etPassword)
+
         // Login button
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -66,6 +71,35 @@ class LoginActivity : Activity() {
         tvRegisterLink.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+    }
+
+    private fun setupPasswordToggle(editText: EditText) {
+        editText.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = editText.compoundDrawablesRelative[2] // Right drawable
+                if (drawableEnd != null && event.rawX >= (editText.right - drawableEnd.bounds.width())) {
+                    togglePasswordVisibility(editText)
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+    }
+
+    private fun togglePasswordVisibility(editText: EditText) {
+        val selection = editText.selectionEnd
+        val isPasswordVisible = editText.transformationMethod == null
+
+        if (isPasswordVisible) {
+            // Hide password
+            editText.transformationMethod = PasswordTransformationMethod.getInstance()
+            editText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_eye_off, 0)
+        } else {
+            // Show password
+            editText.transformationMethod = null
+            editText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_eye, 0)
+        }
+        editText.setSelection(selection)
     }
 
     private fun performLogin(email: String, password: String) {
@@ -136,7 +170,7 @@ class LoginActivity : Activity() {
     private fun showLoading(show: Boolean) {
         progressBar.visibility = if (show) View.VISIBLE else View.GONE
         btnLogin.isEnabled = !show
-        btnLogin.text = if (show) "Logging in..." else "Login"
+        btnLogin.text = if (show) "Logging in..." else "Log In"
     }
 
     private fun showError(message: String) {

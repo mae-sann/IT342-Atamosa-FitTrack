@@ -161,7 +161,7 @@
                 android:inputType="textEmailAddress"
                 android:singleLine="true"/>
 
-            <!-- Password -->
+            <!-- Password with toggle -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -182,11 +182,13 @@
                 android:textColorHint="@color/colorTextMuted"
                 android:textSize="14sp"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="10dp"
                 android:inputType="textPassword"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:drawableEnd="@drawable/ic_eye_off"
+                android:drawableTint="@color/colorTextMuted"/>
 
-            <!-- Confirm Password -->
+            <!-- Confirm Password with toggle -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -207,9 +209,11 @@
                 android:textColorHint="@color/colorTextMuted"
                 android:textSize="14sp"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="10dp"
                 android:inputType="textPassword"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:drawableEnd="@drawable/ic_eye_off"
+                android:drawableTint="@color/colorTextMuted"/>
 
             <!-- Error -->
             <TextView
@@ -260,6 +264,7 @@
                     android:lineSpacingExtra="4dp"/>
 
             </LinearLayout>
+
             <!-- Register button -->
             <Button
                 android:id="@+id/btnRegister"

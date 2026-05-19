@@ -108,20 +108,22 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="6dp"/>
 
-            <!-- Password input -->
+            <!-- Password input with toggle -->
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_input_field"
-                android:hint="••••••••"
+                android:hint="Enter your password"
                 android:textColor="@color/colorTextPrimary"
                 android:textColorHint="@color/colorTextMuted"
                 android:textSize="14sp"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingEnd="10dp"
                 android:inputType="textPassword"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:drawableEnd="@drawable/ic_eye_off"
+                android:drawableTint="@color/colorTextMuted"/>
 
             <!-- Error message -->
             <TextView
