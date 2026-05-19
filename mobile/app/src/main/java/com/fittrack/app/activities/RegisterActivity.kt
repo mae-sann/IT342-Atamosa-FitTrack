@@ -23,14 +23,11 @@ class RegisterActivity : Activity() {
     private lateinit var etEmail: EditText
     private lateinit var etPassword: EditText
     private lateinit var etConfirmPassword: EditText
-    private lateinit var spinnerRole: Spinner
+    private lateinit var cbAgreeTerms: CheckBox
     private lateinit var btnRegister: Button
     private lateinit var tvLoginLink: TextView
     private lateinit var tvError: TextView
     private lateinit var progressBar: View
-
-    // Role options shown in spinner
-    private val roleOptions = listOf("User", "Admin")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,20 +41,11 @@ class RegisterActivity : Activity() {
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
-        spinnerRole = findViewById(R.id.spinnerRole)
+        cbAgreeTerms = findViewById(R.id.cbAgreeTerms)
         btnRegister = findViewById(R.id.btnRegister)
         tvLoginLink = findViewById(R.id.tvLoginLink)
         tvError = findViewById(R.id.tvError)
         progressBar = findViewById(R.id.progressBar)
-
-        // Set up role spinner
-        val adapter = ArrayAdapter(
-            this,
-            R.layout.spinner_item,
-            roleOptions
-        )
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
-        spinnerRole.adapter = adapter
 
         // Register button
         btnRegister.setOnClickListener {
@@ -81,13 +69,10 @@ class RegisterActivity : Activity() {
                     showError("Password must be at least 8 characters")
                 password != confirm ->
                     showError("Passwords do not match")
+                !cbAgreeTerms.isChecked ->
+                    showError("Please agree to the Terms of Service and Privacy Policy")
                 else -> {
-                    // Convert selected role to backend format
-                    val selectedRole = when (spinnerRole.selectedItem.toString()) {
-                        "Admin" -> "ADMIN"
-                        else -> "USER"
-                    }
-                    performRegister(firstName, lastName, email, password, selectedRole)
+                    performRegister(firstName, lastName, email, password)
                 }
             }
         }
@@ -100,8 +85,7 @@ class RegisterActivity : Activity() {
         firstName: String,
         lastName: String,
         email: String,
-        password: String,
-        role: String
+        password: String
     ) {
         showLoading(true)
         hideError()
@@ -115,7 +99,7 @@ class RegisterActivity : Activity() {
                         lastName = lastName,
                         email = email,
                         password = password,
-                        role = role
+                        role = "USER"
                     )
                 )
 
@@ -125,14 +109,11 @@ class RegisterActivity : Activity() {
                     if (response.isSuccessful) {
                         val body = response.body()
 
-                        // Your backend returns: { "user": {...}, "message": "..." }
                         if (body != null && body.user != null) {
                             val user = body.user
 
-                            // Save user ID
                             user.id?.let { tokenManager.saveUserId(it) }
 
-                            // Save user info (use null-safe values)
                             tokenManager.saveUserInfo(
                                 email = user.email,
                                 firstName = user.firstName ?: firstName,
@@ -142,14 +123,12 @@ class RegisterActivity : Activity() {
                                 createdAt = user.createdAt
                             )
 
-                            // Show success message
                             Toast.makeText(
                                 this@RegisterActivity,
                                 "Registration successful! Please login.",
                                 Toast.LENGTH_LONG
                             ).show()
 
-                            // Navigate back to Login screen
                             finish()
                         } else {
                             showError("Registration failed: Invalid response")
@@ -174,7 +153,7 @@ class RegisterActivity : Activity() {
     private fun showLoading(show: Boolean) {
         progressBar.visibility = if (show) View.VISIBLE else View.GONE
         btnRegister.isEnabled = !show
-        btnRegister.text = if (show) "Creating account…" else "Create Account"
+        btnRegister.text = if (show) "Creating account…" else "CREATE ACCOUNT"
     }
 
     private fun showError(message: String) {
